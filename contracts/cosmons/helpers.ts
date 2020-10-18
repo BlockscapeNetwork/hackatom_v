@@ -53,7 +53,7 @@ const defaultOptions: Options = {
   hdPath: makeCosmoshubPath(0),
   faucetToken: "USHELL",
   faucetUrl: "http://localhost",
-  defaultKeyFile: path.join(process.env.HOME, "./peter.key")
+  defaultKeyFile: path.join(process.env.HOME, "localnet.key")
 }
 
 interface Network {
@@ -159,12 +159,23 @@ interface MintInfo {
   readonly cap?: string // decimal as string
 }
 
+interface ContractInfo {
+  readonly name: string
+  readonly symbol: string
+}
+
 interface InitMsg {
   readonly name: string
   readonly symbol: string
-  readonly decimals: number
-  readonly initial_balances: readonly Balances[]
-  readonly mint?: MintInfo
+  readonly minter: string
+}
+// Better to use this interface?
+interface MintMsg {
+  readonly token_id: string
+  readonly owner: string
+  readonly name: string
+  readonly description?: string
+  readonly image?: string
 }
 
 type Expiration = {readonly at_height: number} | {readonly at_time: number} | {readonly never: {}}; 
@@ -194,20 +205,23 @@ interface CW721Instance {
   readonly contractAddress: string
 
   // queries
-  balance: (address?: string) => Promise<string>
+  // balance: (address?: string) => Promise<string>
   allowance: (owner: string, spender: string) => Promise<AllowanceResponse>
   allAllowances: (owner: string, startAfter?: string, limit?: number) => Promise<AllAllowancesResponse>
   allAccounts: (startAfter?: string, limit?: number) => Promise<readonly string[]>
-  tokenInfo: () => Promise<any>
+  contractInfo: () => Promise<any>
+  ownerOf: (owner: string) => Promise<any>
+  nftInfo: (tokenId: string) => Promise<any>
+  // tokenInfo: () => Promise<any>
   minter: () => Promise<any>
 
   // actions
-  mint: (recipient: string, amount: string) => Promise<string>
-  transfer: (recipient: string, amount: string) => Promise<string>
-  burn: (amount: string) => Promise<string>
-  increaseAllowance: (recipient: string, amount: string) => Promise<string>
-  decreaseAllowance: (recipient: string, amount: string) => Promise<string>
-  transferFrom: (owner: string, recipient: string, amount: string) => Promise<string>
+  mint: (token_id: string, owner:string, name:string, description?: string) => Promise<string>
+  transferNft: (recipient: string, token_id: string) => Promise<string>
+  // burn: (amount: string) => Promise<string>
+  // increaseAllowance: (recipient: string, amount: string) => Promise<string>
+  // decreaseAllowance: (recipient: string, amount: string) => Promise<string>
+  // transferFrom: (owner: string, recipient: string, amount: string) => Promise<string>
 }
 
 interface CW721Contract {
@@ -226,12 +240,13 @@ interface CW721Contract {
 
 const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
   const use = (contractAddress: string): CW721Instance => {
+/*    
     const balance = async (account?: string): Promise<string> => {
       const address = account || client.senderAddress;  
       const result = await client.queryContractSmart(contractAddress, {balance: { address }});
       return result.balance;
     };
-
+*/
     const allowance = async (owner: string, spender: string): Promise<AllowanceResponse> => {
       return client.queryContractSmart(contractAddress, {allowance: { owner, spender }});
     };
@@ -245,26 +260,41 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       return accounts.accounts;
     };
 
-    const tokenInfo = async (): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {token_info: { }});
-    };
-
     const minter = async (): Promise<any> => {
       return client.queryContractSmart(contractAddress, {minter: { }});
     };
 
-    // mints tokens, returns transactionHash
-    const mint = async (recipient: string, amount: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {mint: {recipient, amount}});
-      return result.transactionHash;
+    const contractInfo = async (): Promise<any> => {
+      return client.queryContractSmart(contractAddress, {contract_info: { }});
+    };
+
+    const nftInfo = async (token_id: string): Promise<any> => {
+      return client.queryContractSmart(contractAddress, {nft_info: { token_id }});
+    }  
+    // TODO: Need help here
+    const ownerOf = async (token_id: string): Promise<any> => {
+        return await client.queryContractSmart(contractAddress, {owner_of: {token_id}});
     }
 
+
+/*
+    const tokenInfo = async (): Promise<any> => {
+      return client.queryContractSmart(contractAddress, {token_info: { }});
+    };
+*/
+    // mints tokens, returns ?
+    const mint = async (token_id: string, owner: string, name:string, description:string): Promise<string> => {
+      const result = await client.execute(contractAddress, { mint: { token_id, owner, name, description }});
+      return result.transactionHash;
+    }
+   
+   
     // transfers tokens, returns transactionHash
-    const transfer = async (recipient: string, amount: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {transfer: {recipient, amount}});
+    const transferNft = async (recipient: string, token_id: string): Promise<string> => {
+      const result = await client.execute(contractAddress, {transfer_nft: {recipient, token_id}});
       return result.transactionHash;
     }
-
+   /*
     // burns tokens, returns transactionHash
     const burn = async (amount: string): Promise<string> => {
       const result = await client.execute(contractAddress, {burn: {amount}});
@@ -285,21 +315,24 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       const result = await client.execute(contractAddress, {transfer_from: {owner, recipient, amount}});
       return result.transactionHash;
     }
-    
+    */
+
     return {
       contractAddress,
-      balance,
+      //balance,
       allowance,
       allAllowances,
       allAccounts,
-      tokenInfo,
+      contractInfo,
       minter,
       mint,
-      transfer,
-      burn,
-      increaseAllowance,
-      decreaseAllowance,
-      transferFrom,
+      ownerOf,
+      nftInfo,
+      transferNft,
+      // burn,
+      // increaseAllowance,
+      // decreaseAllowance,
+      // transferFrom,
     };
   }
 
