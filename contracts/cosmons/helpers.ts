@@ -27,23 +27,23 @@ interface Options {
   readonly faucetUrl?: string
   readonly defaultKeyFile: string
 }
-/*  
-const coralnetOptions: Options = {
-  httpUrl: 'https://lcd.coralnet.cosmwasm.com',
-  networkId: 'cosmwasm-coral',
-  feeToken: 'ushell',
-  gasPrice: 0.025,
-  bech32prefix: 'coral',
+ 
+const heldernetOptions: Options = {
+  httpUrl: 'https://lcd.heldernet.cosmwasm.com',
+  networkId: 'hackatom-wasm',
+  feeToken: 'ucosm',
+  gasPrice: 0.01,
+  bech32prefix: 'cosmos',
   faucetToken: 'SHELL',
-  faucetUrl: 'https://faucet.coralnet.cosmwasm.com/credit',
+  faucetUrl: 'https://faucet.heldernet.cosmwasm.com/credit',
   hdPath: makeCosmoshubPath(0),
-  defaultKeyFile: path.join(process.env.HOME, ".coral.key"),
+  defaultKeyFile: path.join(process.env.HOME, ".heldernet.key"),
 }
-*/
+
 const defaultOptions: Options = {
   // httpUrl: 'https://lcd.coralnet.cosmwasm.com',
   httpUrl: "http://localhost:1317",
-  //networkId: 'cosmwasm-coral',
+  //networkId: process.env.CW_CHAIN_ID,
   networkId: 'localnet',
   ///feeToken: 'ushell',
   feeToken: 'ucosm',
@@ -53,6 +53,7 @@ const defaultOptions: Options = {
   hdPath: makeCosmoshubPath(0),
   faucetToken: "USHELL",
   faucetUrl: "http://localhost",
+  // faucetUrl: process.env.CW_FAUCET,
   defaultKeyFile: path.join(process.env.HOME, "localnet.key")
 }
 

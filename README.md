@@ -22,8 +22,8 @@ Please consider that helper.ts is using local wasmd instance
 Option 1:
 
 ```
-const client = await useOptions(defaultOptions).setup(<YOUR PASSWORD>;
-const partner = await useOptions(defaultOptions).setup(<YOUR PASSWORD>, "</home/user>.localnet2.key");
+const client = await useOptions(defaultOptions).setup("stufe-104");
+const partner = await useOptions(defaultOptions).setup("mway12345", "/Users/vhahn/.localnet2.key");
 const address = client.senderAddress;
 const partnerAddr = partner.senderAddress;
 ```
@@ -59,7 +59,7 @@ const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 3");
 ```
 or
 ```
-const contract1 = client.getContracts(12);
+const contract = client.getContracts(12); // And check for your contractAddress
 ```
 
 ### Use our contract
