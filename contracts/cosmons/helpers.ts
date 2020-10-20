@@ -34,7 +34,7 @@ const heldernetOptions: Options = {
   feeToken: 'ucosm',
   gasPrice: 0.01,
   bech32prefix: 'cosmos',
-  faucetToken: 'SHELL',
+  faucetToken: 'UCOSM',
   faucetUrl: 'https://faucet.heldernet.cosmwasm.com/credit',
   hdPath: makeCosmoshubPath(0),
   defaultKeyFile: path.join(process.env.HOME, ".heldernet.key"),
@@ -51,7 +51,7 @@ const defaultOptions: Options = {
   //bech32prefix: 'coral',
   bech32prefix: 'cosmos',
   hdPath: makeCosmoshubPath(0),
-  faucetToken: "USHELL",
+  faucetToken: "SHELL",
   faucetUrl: "http://localhost",
   // faucetUrl: process.env.CW_FAUCET,
   defaultKeyFile: path.join(process.env.HOME, "localnet.key")
@@ -79,34 +79,33 @@ const useOptions = (options: Options): Network => {
     const wallet = await Secp256k1Wallet.deserialize(encrypted, password);
     return wallet;
   };
-  
-  const buildFeeTable = (options: Options): FeeTable => {
-    const { feeToken, gasPrice } = options;
-    const stdFee = (gas: number, denom: string, price: number) => {
-      const amount = Math.floor(gas * price)
-      return {
-        amount: [{ amount: amount.toString(), denom: denom }],
-        gas: gas.toString(),
-      }
-    }
-  
-    return {
-      upload: stdFee(1500000, feeToken, gasPrice),
-      init: stdFee(600000, feeToken, gasPrice),
-      migrate: stdFee(600000, feeToken, gasPrice),
-      exec: stdFee(200000, feeToken, gasPrice),
-      send: stdFee(80000, feeToken, gasPrice),
-      changeAdmin: stdFee(80000, feeToken, gasPrice),
-    }
-  };
 
+ const buildFeeTable = (feeToken: string, gasPrice: number): FeeTable => {
+  const stdFee = (gas: number, denom: string, price: number) => {
+    const amount = Math.floor(gas * price)
+    return {
+      amount: [{ amount: amount.toString(), denom: denom }],
+      gas: gas.toString(),
+    }
+  }
+
+  return {
+    upload: stdFee(1000000, feeToken, gasPrice),
+    init: stdFee(500000, feeToken, gasPrice),
+    migrate: stdFee(500000, feeToken, gasPrice),
+    exec: stdFee(200000, feeToken, gasPrice),
+    send: stdFee(80000, feeToken, gasPrice),
+    changeAdmin: stdFee(80000, feeToken, gasPrice),
+  }
+}
   const connect = async (
     wallet: Secp256k1Wallet,
     options: Options
   ): Promise<SigningCosmWasmClient> => {
-    const feeTable = buildFeeTable(options);
+    // V0.22 const feeTable = buildFeeTable(options);
+    const feeTable = buildFeeTable(options.feeToken, options.gasPrice)
     const [{ address }] = await wallet.getAccounts();
-  
+
     const client = new SigningCosmWasmClient(
       options.httpUrl,
       address,
@@ -119,9 +118,9 @@ const useOptions = (options: Options): Network => {
   const hitFaucet = async (
     faucetUrl: string,
     address: string,
-    ticker: string
+    denom: string
   ): Promise<void> => {
-    await axios.post(faucetUrl, { ticker, address });
+    await axios.post(faucetUrl, { denom, address });
   }
   
   const setup = async (password: string, filename?: string): Promise<SigningCosmWasmClient> => {

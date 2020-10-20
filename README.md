@@ -14,7 +14,7 @@ docker run --rm -v "$(pwd)":/code \
 
 npx @cosmjs/cli@^0.22 --init contracts/cosmons/helpers.ts 
 
-Please consider that helper.ts is using local wasmd instance
+Please consider that helper.ts is using local wasmd 0.11.1 instance
 
 
 ### Using a contract
@@ -22,11 +22,18 @@ Please consider that helper.ts is using local wasmd instance
 Option 1:
 
 ```
+// Local 
 const client = await useOptions(defaultOptions).setup("stufe-104");
 const partner = await useOptions(defaultOptions).setup("mway12345", "/Users/vhahn/.localnet2.key");
+
+// or Heldernet
+const client = await useOptions(heldernetOptions).setup("mway12345", "/Users/vhahn/.heldernet.key");
+const partner = await useOptions(heldernetOptions).setup("mway12345", "/Users/vhahn/.heldernet2.key");
+
 const address = client.senderAddress;
 const partnerAddr = partner.senderAddress;
 ```
+
 
 ### Get the factory
 
@@ -88,6 +95,10 @@ mine.transferNft(partnerAddr, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcj
 
 
 #### Advanced tips
+
+```
+const { hitFaucet } = useOptions(heldernetOptions);
+```
 
 
 ##### Second wallet
@@ -163,3 +174,5 @@ type MsgEditNFTMetadata struct {
 Faucet is not supported 
 
 partner.sendTokens(client.senderAddress, [ { denom: 'ucosm', amount: '200000' }])
+
+await useOptions(heldernetOptions).recoverMnemonic("mway12345", "/Users/vhahn/.heldernet.key");
