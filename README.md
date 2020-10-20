@@ -1,4 +1,4 @@
-# Cosmos - A Nft example to manage pokemons or any other digital assets 
+# Cosmons - A Nft example to manage digital collectibles
 
 
 ## How to build
@@ -23,12 +23,12 @@ Option 1:
 
 ```
 // Local 
-const client = await useOptions(defaultOptions).setup("stufe-104");
-const partner = await useOptions(defaultOptions).setup("mway12345", "/Users/vhahn/.localnet2.key");
+const client = await useOptions(defaultOptions).setup(process.env.LOCAL_PASSWORD);
+const partner = await useOptions(defaultOptions).setup(process.env.LOCAL_PASSWORD2, "/Users/vhahn/.localnet2.key");
 
 // or Heldernet
-const client = await useOptions(heldernetOptions).setup("mway12345", "/Users/vhahn/.heldernet.key");
-const partner = await useOptions(heldernetOptions).setup("mway12345", "/Users/vhahn/.heldernet2.key");
+const client = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/vhahn/.heldernet.key");
+const partner = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/vhahn/.heldernet2.key");
 
 const address = client.senderAddress;
 const partnerAddr = partner.senderAddress;
