@@ -23,3 +23,6 @@ artifacts/
 
 # Keys should be uploaded
 *.key
+
+# Internal stuff
+TRANSCRIPT.md
