@@ -1,4 +1,4 @@
-# Cosmos - A Nft example to manage pokemons or any other digital assets 
+# Cosmons - A Nft example to manage pokemons or any other digital assets 
 
 
 ## How to build
