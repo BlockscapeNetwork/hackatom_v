@@ -14,7 +14,8 @@ docker run --rm -v "$(pwd)":/code \
 
 npx @cosmjs/cli@^0.22 --init contracts/cosmons/helpers.ts 
 
-Please consider that helper.ts is using local wasmd instance
+Please consider that helper.ts is using local wasmd 0.11.1 instance
+
 
 
 ### Errata
