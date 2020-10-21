@@ -20,40 +20,72 @@ interface Options {
   readonly httpUrl: string
   readonly networkId: string
   readonly feeToken: string
-  readonly gasPrice: number
+  readonly gasPrice: GasPrice
   readonly bech32prefix: string
   readonly hdPath: readonly Slip10RawIndex[]
   readonly faucetToken: string
   readonly faucetUrl?: string
   readonly defaultKeyFile: string
+  readonly gasLimits: Partial<GasLimits<CosmWasmFeeTable>>
 }
-/*  
-const coralnetOptions: Options = {
-  httpUrl: 'https://lcd.coralnet.cosmwasm.com',
-  networkId: 'cosmwasm-coral',
-  feeToken: 'ushell',
-  gasPrice: 0.025,
-  bech32prefix: 'coral',
-  faucetToken: 'SHELL',
-  faucetUrl: 'https://faucet.coralnet.cosmwasm.com/credit',
+ 
+const heldernetOptions: Options = {
+  httpUrl: 'https://lcd.heldernet.cosmwasm.com',
+  networkId: 'hackatom-wasm',
+  feeToken: 'ucosm',
+  gasPrice:  GasPrice.fromString("0.01ucosm"),
+  bech32prefix: 'cosmos',
+  faucetToken: 'UCOSM',
+  faucetUrl: 'https://faucet.heldernet.cosmwasm.com/credit',
   hdPath: makeCosmoshubPath(0),
-  defaultKeyFile: path.join(process.env.HOME, ".coral.key"),
+  defaultKeyFile: path.join(process.env.HOME, ".heldernet.key"),
+  gasLimits: {
+    upload: 1500000,
+    init: 600000,
+    register:800000,
+    transfer: 80000,
+  },
 }
-*/
+
+const hackatomOptions: Options = {
+  httpUrl: 'https://lcd.heldernet.cosmwasm.com',
+  networkId: 'hackatom-wasm',
+  feeToken: 'ucosm',
+  gasPrice:  GasPrice.fromString("0.025ucosm"),
+  bech32prefix: 'cosmos',
+  faucetToken: 'COSM',
+  faucetUrl: 'https://faucet.cosmwasm.hub.hackatom.dev/credit',
+  hdPath: makeCosmoshubPath(0),
+  defaultKeyFile: path.join(process.env.HOME, ".hackatom.key"),
+  gasLimits: {
+    upload: 1500000,
+    init: 600000,
+    register:800000,
+    transfer: 80000,
+  },
+}
+
 const defaultOptions: Options = {
   // httpUrl: 'https://lcd.coralnet.cosmwasm.com',
   httpUrl: "http://localhost:1317",
-  //networkId: 'cosmwasm-coral',
+  //networkId: process.env.CW_CHAIN_ID,
   networkId: 'localnet',
   ///feeToken: 'ushell',
   feeToken: 'ucosm',
-  gasPrice: 0.025,
+  gasPrice:  GasPrice.fromString("0.025ucosm"),
   //bech32prefix: 'coral',
   bech32prefix: 'cosmos',
   hdPath: makeCosmoshubPath(0),
-  faucetToken: "USHELL",
+  faucetToken: "SHELL",
   faucetUrl: "http://localhost",
-  defaultKeyFile: path.join(process.env.HOME, "localnet.key")
+  // faucetUrl: process.env.CW_FAUCET,
+  defaultKeyFile: path.join(process.env.HOME, "localnet.key"),
+  gasLimits: {
+    upload: 1500000,
+    init: 600000,
+    register:800000,
+    transfer: 80000,
+  },
 }
 
 interface Network {
@@ -63,54 +95,54 @@ interface Network {
 
 const useOptions = (options: Options): Network => {
 
-  const loadOrCreateWallet = async (options: Options, filename: string, password: string): Promise<Secp256k1Wallet> => {
+  const loadOrCreateWallet = async (options: Options, filename: string, password: string): Promise<Secp256k1HdWallet> => {
     let encrypted: string;
     try {
       encrypted = fs.readFileSync(filename, 'utf8');
     } catch (err) {
       // generate if no file exists
-      const wallet = await Secp256k1Wallet.generate(12, options.hdPath, options.bech32prefix);
+      const wallet = await Secp256k1HdWallet.generate(12, options.hdPath, options.bech32prefix);
       const encrypted = await wallet.serialize(password);
       fs.writeFileSync(filename, encrypted, 'utf8');
       return wallet;
     }
     // otherwise, decrypt the file (we cannot put deserialize inside try or it will over-write on a bad password)
-    const wallet = await Secp256k1Wallet.deserialize(encrypted, password);
+    const wallet = await Secp256k1HdWallet.deserialize(encrypted, password);
     return wallet;
   };
-  
-  const buildFeeTable = (options: Options): FeeTable => {
-    const { feeToken, gasPrice } = options;
-    const stdFee = (gas: number, denom: string, price: number) => {
-      const amount = Math.floor(gas * price)
-      return {
-        amount: [{ amount: amount.toString(), denom: denom }],
-        gas: gas.toString(),
-      }
-    }
-  
-    return {
-      upload: stdFee(1500000, feeToken, gasPrice),
-      init: stdFee(600000, feeToken, gasPrice),
-      migrate: stdFee(600000, feeToken, gasPrice),
-      exec: stdFee(200000, feeToken, gasPrice),
-      send: stdFee(80000, feeToken, gasPrice),
-      changeAdmin: stdFee(80000, feeToken, gasPrice),
-    }
-  };
 
+ const buildFeeTable = (feeToken: string, gasPrice: number): CosmWasmFeeTable => {
+  const stdFee = (gas: number, denom: string, price: number) => {
+    const amount = Math.floor(gas * price)
+    return {
+      amount: [{ amount: amount.toString(), denom: denom }],
+      gas: gas.toString(),
+    }
+  }
+
+  return {
+    upload: stdFee(1000000, feeToken, gasPrice),
+    init: stdFee(500000, feeToken, gasPrice),
+    migrate: stdFee(500000, feeToken, gasPrice),
+    exec: stdFee(200000, feeToken, gasPrice),
+    send: stdFee(80000, feeToken, gasPrice),
+    changeAdmin: stdFee(80000, feeToken, gasPrice),
+  }
+}
   const connect = async (
-    wallet: Secp256k1Wallet,
+    wallet: Secp256k1HdWallet,
     options: Options
   ): Promise<SigningCosmWasmClient> => {
-    const feeTable = buildFeeTable(options);
+    // const feeTable = buildFeeTable(options);
+    // const feeTable = buildFeeTable(options.feeToken, options.gasPrice)
     const [{ address }] = await wallet.getAccounts();
-  
+
     const client = new SigningCosmWasmClient(
       options.httpUrl,
       address,
       wallet,
-      feeTable
+      options.gasPrice,
+      options.gasLimits,
     );
     return client;
   };
@@ -118,9 +150,9 @@ const useOptions = (options: Options): Network => {
   const hitFaucet = async (
     faucetUrl: string,
     address: string,
-    ticker: string
+    denom: string
   ): Promise<void> => {
-    await axios.post(faucetUrl, { ticker, address });
+    await axios.post(faucetUrl, { denom, address });
   }
   
   const setup = async (password: string, filename?: string): Promise<SigningCosmWasmClient> => {
@@ -200,6 +232,9 @@ interface AllAccountsResponse {
   readonly accounts: readonly string[];
 }
 
+interface TokensResponse {
+  readonly tokens: readonly string[];
+}
 
 interface CW721Instance {
   readonly contractAddress: string
@@ -212,12 +247,17 @@ interface CW721Instance {
   contractInfo: () => Promise<any>
   ownerOf: (owner: string) => Promise<any>
   nftInfo: (tokenId: string) => Promise<any>
+  allNftInfo: (tokenId: string) => Promise<any>
   // tokenInfo: () => Promise<any>
   minter: () => Promise<any>
+  numTokens: () => Promise<any>
+  tokens: (owner:string, start_after: string, limit: number ) => Promise<TokensResponse>
+  allTokens: (start_after?: string, limit?: number ) => Promise<TokensResponse>
 
   // actions
   mint: (token_id: string, owner:string, name:string, description?: string) => Promise<string>
   transferNft: (recipient: string, token_id: string) => Promise<string>
+  approve: (spender: string, token_id: string, expires?: Expiration) => Promise<string>
   // burn: (amount: string) => Promise<string>
   // increaseAllowance: (recipient: string, amount: string) => Promise<string>
   // decreaseAllowance: (recipient: string, amount: string) => Promise<string>
@@ -232,7 +272,7 @@ interface CW721Contract {
   // codeId must come from a previous deploy
   // label is the public name of the contract in listing
   // if you set admin, you can run migrations on this contract (likely client.senderAddress)
-  instantiate: (codeId: number, initMsg: InitMsg, label: string, admin?: string) => Promise<CW721Instance>
+  instantiate: (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string) => Promise<CW721Instance>
 
   use: (contractAddress: string) => CW721Instance
 }
@@ -271,6 +311,11 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     const nftInfo = async (token_id: string): Promise<any> => {
       return client.queryContractSmart(contractAddress, {nft_info: { token_id }});
     }  
+
+    const allNftInfo = async (token_id: string): Promise<any> => {
+      return client.queryContractSmart(contractAddress, {all_nft_info: { token_id }});
+    } 
+
     // TODO: Need help here
     const ownerOf = async (token_id: string): Promise<any> => {
         return await client.queryContractSmart(contractAddress, {owner_of: {token_id}});
@@ -289,9 +334,28 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     }
    
    
-    // transfers tokens, returns transactionHash
+    // transfers ownership, returns transactionHash
     const transferNft = async (recipient: string, token_id: string): Promise<string> => {
       const result = await client.execute(contractAddress, {transfer_nft: {recipient, token_id}});
+      return result.transactionHash;
+    }
+
+    // total number of tokens issued
+    const numTokens = async (): Promise<any> => {
+      return client.queryContractSmart(contractAddress, {num_tokens: { }});
+    }
+    
+    // list all token_ids that belong to a given owner
+    const tokens = async (owner: string, start_after: string, limit: number): Promise<TokensResponse> => {
+      return client.queryContractSmart(contractAddress, {tokens: { owner, start_after, limit}});
+    }
+
+    const allTokens = async (start_after?: string, limit?: number): Promise<TokensResponse> => {
+      return client.queryContractSmart(contractAddress, {all_tokens: { start_after, limit}});
+    }
+
+    const approve = async (spender: string, token_id: string, expires?: Expiration): Promise<string> => {
+      const result = await client.execute(contractAddress, {approve: {spender, token_id, expires}});
       return result.transactionHash;
     }
    /*
@@ -328,7 +392,12 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       mint,
       ownerOf,
       nftInfo,
+      allNftInfo,
       transferNft,
+      approve,
+      numTokens,
+      tokens,
+      allTokens
       // burn,
       // increaseAllowance,
       // decreaseAllowance,
@@ -355,7 +424,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     return result.codeId;
   }
 
-  const instantiate = async (codeId: number, initMsg: InitMsg, label: string, admin?: string): Promise<CW721Instance> => {
+  const instantiate = async (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string): Promise<CW721Instance> => {
     const result = await client.instantiate(codeId, initMsg, label, { memo: `Init ${label}`, admin});
     return use(result.contractAddress);
   }
