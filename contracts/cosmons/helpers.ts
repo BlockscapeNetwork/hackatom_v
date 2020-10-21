@@ -33,7 +33,7 @@ const defaultOptions: Options = {
   httpUrl: 'https://rest.cosmwasm.hub.hackatom.dev',
   networkId: 'hackatom-wasm',
   feeToken: 'ucosm',
-  gasPrice:  GasPrice.fromString("0.01ucosm"),
+  gasPrice:  GasPrice.fromString("0.025ucosm"),
   bech32prefix: 'cosmos',
   faucetToken: 'COSM',
   faucetUrl: 'https://faucet.cosmwasm.hub.hackatom.dev/credit',
@@ -134,8 +134,8 @@ const useOptions = (options: Options): Network => {
   
   const setup = async (password: string, filename?: string): Promise<SigningCosmWasmClient> => {
     const keyfile = filename || options.defaultKeyFile;
-    const wallet = await loadOrCreateWallet(defaultOptions, keyfile, password);
-    const client = await connect(wallet, defaultOptions);
+    const wallet = await loadOrCreateWallet(options, keyfile, password);
+    const client = await connect(wallet, options);
 
     // ensure we have some tokens
     if (options.faucetUrl) {
@@ -151,7 +151,7 @@ const useOptions = (options: Options): Network => {
 
   const recoverMnemonic = async (password: string, filename?: string): Promise<string> => {
     const keyfile = filename || options.defaultKeyFile;
-    const wallet = await loadOrCreateWallet(defaultOptions, keyfile, password);
+    const wallet = await loadOrCreateWallet(options, keyfile, password);
     return wallet.mnemonic;
   }
 
