@@ -343,7 +343,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     }
 
     const approveAll = async (operator: string, expires?: Expiration): Promise<string> => {
-      const result = await client.execute(contractAddress, {approveAll: {operator, expires}})
+      const result = await client.execute(contractAddress, {approve_all: {operator, expires}})
       return result.transactionHash
     }
    /*
