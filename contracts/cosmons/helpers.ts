@@ -29,16 +29,16 @@ interface Options {
   readonly gasLimits: Partial<GasLimits<CosmWasmFeeTable>>
 }
  
-const heldernetOptions: Options = {
-  httpUrl: 'https://lcd.heldernet.cosmwasm.com',
+const defaultOptions: Options = {
+  httpUrl: 'https://rest.cosmwasm.hub.hackatom.dev',
   networkId: 'hackatom-wasm',
   feeToken: 'ucosm',
   gasPrice:  GasPrice.fromString("0.025ucosm"),
   bech32prefix: 'cosmos',
-  faucetToken: 'ucosm',
-  faucetUrl: 'https://faucet.heldernet.cosmwasm.com/credit',
+  faucetToken: 'COSM',
+  faucetUrl: 'https://faucet.cosmwasm.hub.hackatom.dev/credit',
   hdPath: makeCosmoshubPath(0),
-  defaultKeyFile: path.join(process.env.HOME, ".heldernet.key"),
+  defaultKeyFile: path.join(process.env.HOME, ".hackatom.key"),
   gasLimits: {
     upload: 1500000,
     init: 600000,
@@ -46,21 +46,16 @@ const heldernetOptions: Options = {
     transfer: 80000,
   },
 }
-
-const defaultOptions: Options = {
-  // httpUrl: 'https://lcd.coralnet.cosmwasm.com',
+ 
+const localnetOptions: Options = {
   httpUrl: "http://localhost:1317",
-  //networkId: process.env.CW_CHAIN_ID,
   networkId: 'localnet',
-  ///feeToken: 'ushell',
   feeToken: 'ucosm',
   gasPrice:  GasPrice.fromString("0.025ucosm"),
-  //bech32prefix: 'coral',
   bech32prefix: 'cosmos',
   hdPath: makeCosmoshubPath(0),
   faucetToken: "SHELL",
   faucetUrl: "http://localhost",
-  // faucetUrl: process.env.CW_FAUCET,
   defaultKeyFile: path.join(process.env.HOME, "localnet.key"),
   gasLimits: {
     upload: 1500000,
@@ -163,6 +158,8 @@ const useOptions = (options: Options): Network => {
   return {setup, recoverMnemonic};
 }
 
+type TokenId = string
+
 interface Balances {
   readonly address: string
   readonly amount: string  // decimal as string
@@ -227,19 +224,19 @@ interface CW721Instance {
   allAllowances: (owner: string, startAfter?: string, limit?: number) => Promise<AllAllowancesResponse>
   allAccounts: (startAfter?: string, limit?: number) => Promise<readonly string[]>
   contractInfo: () => Promise<any>
-  ownerOf: (owner: string) => Promise<any>
-  nftInfo: (tokenId: string) => Promise<any>
-  allNftInfo: (tokenId: string) => Promise<any>
+  ownerOf: (tokenId: TokenId) => Promise<any>
+  nftInfo: (tokenId: TokenId) => Promise<any>
+  allNftInfo: (tokenId: TokenId) => Promise<any>
   // tokenInfo: () => Promise<any>
   minter: () => Promise<any>
   numTokens: () => Promise<any>
-  tokens: (owner:string, start_after: string, limit: number ) => Promise<TokensResponse>
-  allTokens: (start_after?: string, limit?: number ) => Promise<TokensResponse>
+  tokens: (owner:string, startAfter?: string, limit?: number ) => Promise<TokensResponse>
+  allTokens: (startAfter?: string, limit?: number ) => Promise<TokensResponse>
 
   // actions
-  mint: (token_id: string, owner:string, name:string, description?: string) => Promise<string>
-  transferNft: (recipient: string, token_id: string) => Promise<string>
-  approve: (spender: string, token_id: string, expires?: Expiration) => Promise<string>
+  mint: (tokenId: TokenId, owner:string, name:string, description?: string, image?: string) => Promise<string>
+  transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
+  approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
   // burn: (amount: string) => Promise<string>
   // increaseAllowance: (recipient: string, amount: string) => Promise<string>
   // decreaseAllowance: (recipient: string, amount: string) => Promise<string>
@@ -310,8 +307,8 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     };
 */
     // mints tokens, returns ?
-    const mint = async (token_id: string, owner: string, name:string, description:string): Promise<string> => {
-      const result = await client.execute(contractAddress, { mint: { token_id, owner, name, description }});
+    const mint = async (token_id: string, owner: string, name:string, description?:string, image?:string): Promise<string> => {
+      const result = await client.execute(contractAddress, { mint: { token_id, owner, name, description, image }});
       return result.transactionHash;
     }
    
@@ -328,7 +325,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     }
     
     // list all token_ids that belong to a given owner
-    const tokens = async (owner: string, start_after: string, limit: number): Promise<TokensResponse> => {
+    const tokens = async (owner: string, start_after?: string, limit?: number): Promise<TokensResponse> => {
       return client.queryContractSmart(contractAddress, {tokens: { owner, start_after, limit}});
     }
 
