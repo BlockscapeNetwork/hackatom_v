@@ -1,99 +1,118 @@
-# Cosmons - A Nft example to manage digital collectibles
+# Cosmons - An NFT Example for Managing Digital Collectibles
 
+## How to Build
 
-## How to build
+In order to optimize your smart contracts, you have to use:
 
-To optimize your smart contracts you have to use:
-
+```shell
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
   cosmwasm/workspace-optimizer:0.10.4
+```
 
-## How to work with REPL 
+## How to Work with REPL
 
-npx @cosmjs/cli@^0.23 --init contracts/cosmons/helpers.ts 
+`npx @cosmjs/cli@^0.23 --init contracts/cosmons/helpers.ts`
 
-Please consider that helper.ts is using local wasmd 0.11.1 instance. Please update it to your parameters. 
+:warning: Please, keep in mind that helper.ts uses a local wasmd 0.11.1 instance. Please, update your parameters accordingly.
 
-
-You can use ```heldernetOptions``` in useOptions instead
+For heldernet, you need to use `defaultOptions` in useOptions.
 
 ### Using a contract
 
-Option 1:
-
-```
-// Local 
+```typescript
+// Local
 const client = await useOptions(defaultOptions).setup(<YOUR PASSWORD>);
 const partner = await useOptions(defaultOptions).setup(<YOUR PASSWORD>, "/Users/user/.localnet2.key");
 
-// or Heldernet
-const client = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/.heldernet.key");
-const partner = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/.heldernet2.key");
+// Heldernet
+const client = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/heldernet.key");
+const partner = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/heldernet2.key");
 
 const address = client.senderAddress;
 const partnerAddr = partner.senderAddress;
 ```
 
-### Get the factory
+### Get the Factory
 
-```
+```typescript
 const cw721 = CW721(client);
 ```
 
-### Verify amount in the account
+### Verify Funds in the Account
 
-```
+```typescript
 client.getAccount()
 partner.getAccount()
 ```
 
-### Use existing Accounts
+### Use Existing Accounts
 
-You can skip this section if followed this transcript until here.
-```
+You can skip this section if followed this transcript up until here.
+
+```typescript
 const fred = "cosmos1rgd5jtgp22vq44xz4c69x5z9mu0q92ujcnqdgw";
 const bob = "cosmos1exmd9ml0adgkuggd6knqcjgw4e3x84r4hhfr07";
 ```
+
 Query accounts:
-wasmcli query account $(wasmcli keys show -a fred) 
-wasmcli query account $(wasmcli keys show -a vhx) 
+`wasmcli query account $(wasmcli keys show -a fred)`
+`wasmcli query account $(wasmcli keys show -a vhx)`
 
-### Initiate Contract
+### Instantiate the Contract
 
-```
+```typescript
 const codeId = <your CodeID>; // wasmcli q wasm list-code & find your contract ID
 const initMsg = { name: "Cosmons", symbol: "mons",  minter: address };
 const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 1");
 ```
-or
-```
+
+**OR**
+
+```typescript
 const contract = client.getContracts(<your codeID>); // And check for your contractAddress
 ```
 
-### Use our contract
+### Use Contract
 
-```
+```typescript
 const mine = cw721.use(contract.contractAddress);
 ```
 
-### Let us mint an asset
+### Mint a Cosmon NFT
 
+```typescript
+mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", "Minted Cosmon!");
 ```
-mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", "Some Text");
+
+### Approve Token Transfer
+
+> :warning: Needs to be called before `transferNft`.
+
+```typescript
+mine.approve(address, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
+```
+
+### Revoke Token Transfer
+
+> :warning: `transferNft` will not work after using `revoke`.
+
+```typescript
+mine.revoke(address, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
 ```
 
 ### Transfer Token to Partner
-mine.transferNft(partnerAddr, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
 
-### Approve Contract
-// Don't call transferNft before, otherwise it fails
-mine.approve(address, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
+> :warning: Needs to be called after `approve`.
+
+```typescript
+mine.transferNft(partnerAddr, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
+```
 
 #### Queries
 
-```
+```typescript
 mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
 mine.ownerOf("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
 mine.numTokens()
@@ -104,5 +123,4 @@ mine.allTokens("", 10)
 
 ### Errata
 
-Faucet is not supported
-
+Faucet is not supported.
