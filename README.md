@@ -14,12 +14,8 @@ docker run --rm -v "$(pwd)":/code \
 
 npx @cosmjs/cli@^0.23 --init contracts/cosmons/helpers.ts 
 
-<<<<<<< HEAD
 Please consider that helper.ts is using local wasmd 0.11.1 instance. Please update it to your parameters. 
-=======
-Please consider that helper.ts is using local wasmd 0.11.1 instance
 
->>>>>>> master
 
 You can use ```heldernetOptions``` in useOptions instead
 
@@ -30,11 +26,11 @@ Option 1:
 ```
 // Local 
 const client = await useOptions(defaultOptions).setup(<YOUR PASSWORD>);
-const partner = await useOptions(defaultOptions).setup(<YOUR PASSWORD>, "/Users/vhahn/.localnet2.key");
+const partner = await useOptions(defaultOptions).setup(<YOUR PASSWORD>, "/Users/user/.localnet2.key");
 
 // or Heldernet
-const client = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/vhahn/.heldernet.key");
-const partner = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/vhahn/.heldernet2.key");
+const client = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/.heldernet.key");
+const partner = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/.heldernet2.key");
 
 const address = client.senderAddress;
 const partnerAddr = partner.senderAddress;
