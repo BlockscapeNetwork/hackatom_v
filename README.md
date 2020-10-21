@@ -14,12 +14,8 @@ docker run --rm -v "$(pwd)":/code \
 
 npx @cosmjs/cli@^0.23 --init contracts/cosmons/helpers.ts 
 
-<<<<<<< HEAD
 Please consider that helper.ts is using local wasmd 0.11.1 instance. Please update it to your parameters. 
-=======
-Please consider that helper.ts is using local wasmd 0.11.1 instance
 
->>>>>>> master
 
 You can use ```heldernetOptions``` in useOptions instead
 
