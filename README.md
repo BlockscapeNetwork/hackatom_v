@@ -50,25 +50,25 @@ partner.getAccount()
 
 ### Use existing Accounts
 
-You can skip this if followed this transcript here.
+You can skip this section if followed this transcript until here.
 ```
 const fred = "cosmos1rgd5jtgp22vq44xz4c69x5z9mu0q92ujcnqdgw";
 const bob = "cosmos1exmd9ml0adgkuggd6knqcjgw4e3x84r4hhfr07";
 ```
-
+Query accounts:
 wasmcli query account $(wasmcli keys show -a fred) 
 wasmcli query account $(wasmcli keys show -a vhx) 
 
 ### Initiate Contract
 
 ```
-const codeId = 12; // wasmcli q wasm list-code & find your contract
+const codeId = <your CodeID>; // wasmcli q wasm list-code & find your contract ID
 const initMsg = { name: "Cosmons", symbol: "mons",  minter: address };
-const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 3");
+const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 1");
 ```
 or
 ```
-const contract = client.getContracts(12); // And check for your contractAddress
+const contract = client.getContracts(<your codeID>); // And check for your contractAddress
 ```
 
 ### Use our contract
@@ -84,20 +84,21 @@ mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, 
 ```
 
 ### Transfer Token to Partner
-mine.transferNft(partnerAddr, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsy");
+mine.transferNft(partnerAddr, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
 
 ### Approve Contract
 // Don't call transferNft before, otherwise it fails
-mine.approve(address, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx");
+mine.approve(address, "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb");
 
 #### Queries
 
 ```
-mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsy")
-mine.ownerOf("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsy")
+mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
+mine.ownerOf("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
 mine.numTokens()
 mine.tokens(address, "", 10)
-mine.allNftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsy")
+mine.allNftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
+mine.allTokens("", 10)
 ```
 
 ### Errata
