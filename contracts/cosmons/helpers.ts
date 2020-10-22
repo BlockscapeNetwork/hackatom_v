@@ -33,7 +33,7 @@ const defaultOptions: Options = {
   httpUrl: 'https://rest.cosmwasm.hub.hackatom.dev',
   networkId: 'hackatom-wasm',
   feeToken: 'ucosm',
-  gasPrice:  GasPrice.fromString("0.025ucosm"),
+  gasPrice: GasPrice.fromString("0.025ucosm"),
   bech32prefix: 'cosmos',
   faucetToken: 'COSM',
   faucetUrl: 'https://faucet.cosmwasm.hub.hackatom.dev/credit',
@@ -51,7 +51,7 @@ const localnetOptions: Options = {
   httpUrl: "http://localhost:1317",
   networkId: 'localnet',
   feeToken: 'ucosm',
-  gasPrice:  GasPrice.fromString("0.025ucosm"),
+  gasPrice: GasPrice.fromString("0.025ucosm"),
   bech32prefix: 'cosmos',
   hdPath: makeCosmoshubPath(0),
   faucetToken: "SHELL",
@@ -230,11 +230,12 @@ interface CW721Instance {
   // tokenInfo: () => Promise<any>
   minter: () => Promise<any>
   numTokens: () => Promise<any>
-  tokens: (owner:string, startAfter?: string, limit?: number ) => Promise<TokensResponse>
+  tokens: (owner:string, startAfter?: string, limit?: number) => Promise<TokensResponse>
   allTokens: (startAfter?: string, limit?: number ) => Promise<TokensResponse>
+  approvedForAll: (owner: string, include_expired?: boolean, start_after?: string, limit?: number) => Promise<any>
 
   // actions
-  mint: (tokenId: TokenId, owner:string, name:string, description?: string, image?: string) => Promise<string>
+  mint: (tokenId: TokenId, owner: string, name: string, description?: string, image?: string) => Promise<string>
   transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
   approveAll: (operator: string, expires?: Expiration) => Promise<string>
@@ -299,10 +300,12 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
 
     // TODO: Need help here
     const ownerOf = async (token_id: TokenId): Promise<any> => {
-        return await client.queryContractSmart(contractAddress, {owner_of: {token_id}});
+      return await client.queryContractSmart(contractAddress, {owner_of: {token_id}});
     }
 
-
+    const approvedForAll = async (owner: string, include_expired?: boolean, start_after?: string, limit?: number): Promise<any> => {
+      return await client.queryContractSmart(contractAddress, {approved_for_all: {owner, include_expired, start_after, limit}})
+    }
 /*
     const tokenInfo = async (): Promise<any> => {
       return client.queryContractSmart(contractAddress, {token_info: { }});
@@ -382,6 +385,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       minter,
       mint,
       ownerOf,
+      approvedForAll,
       nftInfo,
       allNftInfo,
       transferNft,
