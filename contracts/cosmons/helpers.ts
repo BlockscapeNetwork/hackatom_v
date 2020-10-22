@@ -238,7 +238,7 @@ interface CW721Instance {
   transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
   approveAll: (operator: string, expires?: Expiration) => Promise<string>
-  revoke: (spender: string, tokenId: string) => Promise<string>
+  revoke: (spender: string, tokenId: TokenId) => Promise<string>
   // burn: (amount: string) => Promise<string>
   // increaseAllowance: (recipient: string, amount: string) => Promise<string>
   // decreaseAllowance: (recipient: string, amount: string) => Promise<string>
