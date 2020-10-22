@@ -33,7 +33,7 @@ const defaultOptions: Options = {
   httpUrl: 'https://rest.cosmwasm.hub.hackatom.dev',
   networkId: 'hackatom-wasm',
   feeToken: 'ucosm',
-  gasPrice:  GasPrice.fromString("0.025ucosm"),
+  gasPrice: GasPrice.fromString("0.025ucosm"),
   bech32prefix: 'cosmos',
   faucetToken: 'COSM',
   faucetUrl: 'https://faucet.cosmwasm.hub.hackatom.dev/credit',
@@ -51,7 +51,7 @@ const localnetOptions: Options = {
   httpUrl: "http://localhost:1317",
   networkId: 'localnet',
   feeToken: 'ucosm',
-  gasPrice:  GasPrice.fromString("0.025ucosm"),
+  gasPrice: GasPrice.fromString("0.025ucosm"),
   bech32prefix: 'cosmos',
   hdPath: makeCosmoshubPath(0),
   faucetToken: "SHELL",
@@ -239,6 +239,7 @@ interface CW721Instance {
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
   approveAll: (operator: string, expires?: Expiration) => Promise<string>
   revoke: (spender: string, tokenId: TokenId) => Promise<string>
+  revokeAll: (operator: string) => Promise<string>
   // burn: (amount: string) => Promise<string>
   // increaseAllowance: (recipient: string, amount: string) => Promise<string>
   // decreaseAllowance: (recipient: string, amount: string) => Promise<string>
@@ -301,8 +302,6 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     const ownerOf = async (token_id: TokenId): Promise<any> => {
         return await client.queryContractSmart(contractAddress, {owner_of: {token_id}});
     }
-
-
 /*
     const tokenInfo = async (): Promise<any> => {
       return client.queryContractSmart(contractAddress, {token_info: { }});
@@ -313,7 +312,6 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       const result = await client.execute(contractAddress, { mint: { token_id, owner, name, description, image }});
       return result.transactionHash;
     }
-   
    
     // transfers ownership, returns transactionHash
     const transferNft = async (recipient: string, token_id: TokenId): Promise<string> => {
@@ -347,6 +345,11 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     
     const revoke = async (spender: string, token_id: TokenId): Promise<string> => {
       const result = await client.execute(contractAddress, {revoke: {spender, token_id}});
+      return result.transactionHash;
+    }
+
+    const revokeAll = async (operator: string): Promise<string> => {
+      const result = await client.execute(contractAddress, {revoke_all: {operator}})
       return result.transactionHash;
     }
    /*
@@ -388,6 +391,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       approve,
       approveAll,
       revoke,
+      revokeAll,
       numTokens,
       tokens,
       allTokens
