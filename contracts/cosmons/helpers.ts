@@ -325,8 +325,8 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       return result.transactionHash;
     }
 
-    // sends an nft token to another contract (TODO: Needs to be revisited once receiveNft is implemented, not sure if BinaryType is correct)
-    const sendNft = async (contract: string, token_id: TokenId, msg?: BinaryType): Promise<string> => {
+    // sends an nft token to another contract (TODO: msg type any needs to be revisited once receiveNft is implemented)
+    const sendNft = async (contract: string, token_id: TokenId, msg?: any): Promise<string> => {
       const result = await client.execute(contractAddress, {send_nft: {contract, token_id, msg}})
       return result.transactionHash;
     }
