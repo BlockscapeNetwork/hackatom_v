@@ -240,6 +240,7 @@ interface CW721Instance {
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
   approveAll: (operator: string, expires?: Expiration) => Promise<string>
   revoke: (spender: string, tokenId: TokenId) => Promise<string>
+  revokeAll: (operator: string) => Promise<string>
   // burn: (amount: string) => Promise<string>
   // increaseAllowance: (recipient: string, amount: string) => Promise<string>
   // decreaseAllowance: (recipient: string, amount: string) => Promise<string>
@@ -317,7 +318,6 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       return result.transactionHash;
     }
    
-   
     // transfers ownership, returns transactionHash
     const transferNft = async (recipient: string, token_id: TokenId): Promise<string> => {
       const result = await client.execute(contractAddress, {transfer_nft: {recipient, token_id}});
@@ -350,6 +350,11 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     
     const revoke = async (spender: string, token_id: TokenId): Promise<string> => {
       const result = await client.execute(contractAddress, {revoke: {spender, token_id}});
+      return result.transactionHash;
+    }
+
+    const revokeAll = async (operator: string): Promise<string> => {
+      const result = await client.execute(contractAddress, {revoke_all: {operator}})
       return result.transactionHash;
     }
    /*
@@ -392,6 +397,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       approve,
       approveAll,
       revoke,
+      revokeAll,
       numTokens,
       tokens,
       allTokens
