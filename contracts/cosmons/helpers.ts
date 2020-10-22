@@ -237,6 +237,7 @@ interface CW721Instance {
   // actions
   mint: (tokenId: TokenId, owner: string, name: string, description?: string, image?: string) => Promise<string>
   transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
+  sendNft: (contract: string, token_id: TokenId, msg?: BinaryType) => Promise<string>
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
   approveAll: (operator: string, expires?: Expiration) => Promise<string>
   revoke: (spender: string, tokenId: TokenId) => Promise<string>
@@ -324,6 +325,12 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       return result.transactionHash;
     }
 
+    // sends an nft token to another contract
+    const sendNft = async (contract: string, token_id: TokenId, msg?: BinaryType): Promise<string> => {
+      const result = await client.execute(contractAddress, {send_nft: {contract, token_id, msg}})
+      return result.transactionHash;
+    }
+
     // total number of tokens issued
     const numTokens = async (): Promise<any> => {
       return client.queryContractSmart(contractAddress, {num_tokens: { }});
@@ -394,6 +401,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       nftInfo,
       allNftInfo,
       transferNft,
+      sendNft,
       approve,
       approveAll,
       revoke,
