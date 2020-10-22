@@ -182,7 +182,7 @@ interface InitMsg {
 }
 // Better to use this interface?
 interface MintMsg {
-  readonly token_id: string
+  readonly token_id: TokenId
   readonly owner: string
   readonly name: string
   readonly description?: string
