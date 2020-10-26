@@ -236,6 +236,7 @@ interface CW721Instance {
 
   // actions
   mint: (tokenId: TokenId, owner: string, name: string, level: number, description?: string, image?: string) => Promise<string>
+  battleMonster: (token_id0: TokenId, token_id1: TokenId) => Promise<any>
   transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
   sendNft: (contract: string, token_id: TokenId, msg?: BinaryType) => Promise<string>
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
@@ -319,6 +320,12 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       return result.transactionHash;
     }
 
+    // battle Monster
+    const battleMonster = async (token_id0: TokenId, token_id1: TokenId): Promise<string> => {
+      const result = await client.execute(contractAddress, { battle_monster: { token_id0, token_id1 } });
+      return result.transactionHash;
+    }
+
     // transfers ownership, returns transactionHash
     const transferNft = async (recipient: string, token_id: TokenId): Promise<string> => {
       const result = await client.execute(contractAddress, { transfer_nft: { recipient, token_id } });
@@ -396,6 +403,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
       contractInfo,
       minter,
       mint,
+      battleMonster,
       ownerOf,
       approvedForAll,
       nftInfo,
@@ -467,5 +475,12 @@ mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, 
 
 mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
 
+
+----
+
+mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", 20, "Minted Cosmon!");
+mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx", address, "Cosmos", 25, "Minted Cosmon!");
+
+mine.battleMonster("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb","monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx");
 
 */

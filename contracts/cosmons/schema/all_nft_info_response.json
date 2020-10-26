@@ -102,6 +102,7 @@
       "type": "object",
       "required": [
         "description",
+        "level",
         "name"
       ],
       "properties": {
@@ -115,6 +116,12 @@
             "string",
             "null"
           ]
+        },
+        "level": {
+          "description": "Describes Monster level",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
         },
         "name": {
           "description": "Identifies the asset to which this NFT represents",

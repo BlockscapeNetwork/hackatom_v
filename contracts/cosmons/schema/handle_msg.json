@@ -62,6 +62,29 @@
       }
     },
     {
+      "type": "object",
+      "required": [
+        "battle_monster"
+      ],
+      "properties": {
+        "battle_monster": {
+          "type": "object",
+          "required": [
+            "token_id0",
+            "token_id1"
+          ],
+          "properties": {
+            "token_id0": {
+              "type": "string"
+            },
+            "token_id1": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
       "description": "Allows operator to transfer / send the token from the owner's account. If expiration is set, then this allowance has a time/height limit",
       "type": "object",
       "required": [
@@ -238,6 +261,7 @@
     "MintMsg": {
       "type": "object",
       "required": [
+        "level",
         "name",
         "owner",
         "token_id"
@@ -256,6 +280,11 @@
             "string",
             "null"
           ]
+        },
+        "level": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
         },
         "name": {
           "description": "Identifies the asset to which this NFT represents",

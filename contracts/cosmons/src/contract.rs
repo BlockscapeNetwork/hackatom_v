@@ -47,6 +47,10 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 ) -> Result<HandleResponse, ContractError> {
     match msg {
         HandleMsg::Mint(msg) => handle_mint(deps, env, info, msg),
+        HandleMsg::BattleMonster {
+            token_id0,
+            token_id1,
+        } => handle_battle_monster(deps, env, info, token_id0, token_id1),
         HandleMsg::Approve {
             spender,
             token_id,
@@ -69,6 +73,35 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
             msg,
         } => handle_send_nft(deps, env, info, contract, token_id, msg),
     }
+}
+
+pub fn handle_battle_monster<S: Storage, A: Api, Q: Querier>(
+    deps: &mut Extern<S, A, Q>,
+    _env: Env,
+    _info: MessageInfo,
+    token_id0: String,
+    token_id1: String,
+) -> Result<HandleResponse, ContractError> {
+    let mut info_token_id0 = tokens().load(&deps.storage, &token_id0)?;
+    let mut info_token_id1 = tokens().load(&deps.storage, &token_id1)?;
+    if info_token_id0.level >= info_token_id1.level {
+        info_token_id0.level += 2;
+        info_token_id1.level += 1;
+    } else {
+        info_token_id0.level += 1;
+        info_token_id1.level += 2;
+    }
+    tokens().save(&mut deps.storage, &token_id0, &info_token_id0)?;
+    tokens().save(&mut deps.storage, &token_id1, &info_token_id1)?;
+    Ok(HandleResponse {
+        messages: vec![],
+        attributes: vec![
+            attr("action", "battle_monster"),
+            attr("token_id0", token_id0),
+            attr("token_id1", token_id1),
+        ],
+        data: None,
+    })
 }
 
 pub fn handle_mint<S: Storage, A: Api, Q: Querier>(

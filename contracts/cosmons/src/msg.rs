@@ -34,6 +34,10 @@ pub enum HandleMsg {
         token_id: String,
         msg: Option<Binary>,
     },
+    BattleMonster{
+        token_id0: String,
+        token_id1: String
+    },
     /// Allows operator to transfer / send the token from the owner's account.
     /// If expiration is set, then this allowance has a time/height limit
     Approve {
