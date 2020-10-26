@@ -95,6 +95,8 @@ pub struct ContractInfoResponse {
 pub struct NftInfoResponse {
     /// Identifies the asset to which this NFT represents
     pub name: String,
+    /// Describes Monster level
+    pub level: u64,
     /// Describes the asset to which this NFT represents
     pub description: String,
     /// "A URI pointing to a resource with mime type image/* representing the asset to which this

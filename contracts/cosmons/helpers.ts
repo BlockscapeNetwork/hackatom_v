@@ -28,7 +28,7 @@ interface Options {
   readonly defaultKeyFile: string
   readonly gasLimits: Partial<GasLimits<CosmWasmFeeTable>>
 }
- 
+
 const defaultOptions: Options = {
   httpUrl: 'https://rest.cosmwasm.hub.hackatom.dev',
   networkId: 'hackatom-wasm',
@@ -42,11 +42,11 @@ const defaultOptions: Options = {
   gasLimits: {
     upload: 1500000,
     init: 600000,
-    register:800000,
+    register: 800000,
     transfer: 80000,
   },
 }
- 
+
 const localnetOptions: Options = {
   httpUrl: "http://localhost:1317",
   networkId: 'localnet',
@@ -60,7 +60,7 @@ const localnetOptions: Options = {
   gasLimits: {
     upload: 1500000,
     init: 600000,
-    register:800000,
+    register: 800000,
     transfer: 80000,
   },
 }
@@ -88,24 +88,24 @@ const useOptions = (options: Options): Network => {
     return wallet;
   };
 
- const buildFeeTable = (feeToken: string, gasPrice: number): CosmWasmFeeTable => {
-  const stdFee = (gas: number, denom: string, price: number) => {
-    const amount = Math.floor(gas * price)
+  const buildFeeTable = (feeToken: string, gasPrice: number): CosmWasmFeeTable => {
+    const stdFee = (gas: number, denom: string, price: number) => {
+      const amount = Math.floor(gas * price)
+      return {
+        amount: [{ amount: amount.toString(), denom: denom }],
+        gas: gas.toString(),
+      }
+    }
+
     return {
-      amount: [{ amount: amount.toString(), denom: denom }],
-      gas: gas.toString(),
+      upload: stdFee(1000000, feeToken, gasPrice),
+      init: stdFee(500000, feeToken, gasPrice),
+      migrate: stdFee(500000, feeToken, gasPrice),
+      exec: stdFee(200000, feeToken, gasPrice),
+      send: stdFee(80000, feeToken, gasPrice),
+      changeAdmin: stdFee(80000, feeToken, gasPrice),
     }
   }
-
-  return {
-    upload: stdFee(1000000, feeToken, gasPrice),
-    init: stdFee(500000, feeToken, gasPrice),
-    migrate: stdFee(500000, feeToken, gasPrice),
-    exec: stdFee(200000, feeToken, gasPrice),
-    send: stdFee(80000, feeToken, gasPrice),
-    changeAdmin: stdFee(80000, feeToken, gasPrice),
-  }
-}
   const connect = async (
     wallet: Secp256k1HdWallet,
     options: Options
@@ -123,7 +123,7 @@ const useOptions = (options: Options): Network => {
     );
     return client;
   };
-  
+
   const hitFaucet = async (
     faucetUrl: string,
     address: string,
@@ -131,7 +131,7 @@ const useOptions = (options: Options): Network => {
   ): Promise<void> => {
     await axios.post(faucetUrl, { denom, address });
   }
-  
+
   const setup = async (password: string, filename?: string): Promise<SigningCosmWasmClient> => {
     const keyfile = filename || options.defaultKeyFile;
     const wallet = await loadOrCreateWallet(options, keyfile, password);
@@ -143,7 +143,7 @@ const useOptions = (options: Options): Network => {
       if (!account) {
         console.log(`Getting ${options.feeToken} from faucet`);
         await hitFaucet(options.faucetUrl, client.senderAddress, options.faucetToken);
-      }  
+      }
     }
 
     return client;
@@ -155,7 +155,7 @@ const useOptions = (options: Options): Network => {
     return wallet.mnemonic;
   }
 
-  return {setup, recoverMnemonic};
+  return { setup, recoverMnemonic };
 }
 
 type TokenId = string
@@ -189,7 +189,7 @@ interface MintMsg {
   readonly image?: string
 }
 
-type Expiration = {readonly at_height: number} | {readonly at_time: number} | {readonly never: {}}; 
+type Expiration = { readonly at_height: number } | { readonly at_time: number } | { readonly never: {} };
 
 interface AllowanceResponse {
   readonly allowance: string;  // integer as string
@@ -230,12 +230,12 @@ interface CW721Instance {
   // tokenInfo: () => Promise<any>
   minter: () => Promise<any>
   numTokens: () => Promise<any>
-  tokens: (owner:string, startAfter?: string, limit?: number) => Promise<TokensResponse>
-  allTokens: (startAfter?: string, limit?: number ) => Promise<TokensResponse>
+  tokens: (owner: string, startAfter?: string, limit?: number) => Promise<TokensResponse>
+  allTokens: (startAfter?: string, limit?: number) => Promise<TokensResponse>
   approvedForAll: (owner: string, include_expired?: boolean, start_after?: string, limit?: number) => Promise<any>
 
   // actions
-  mint: (tokenId: TokenId, owner: string, name: string, description?: string, image?: string) => Promise<string>
+  mint: (tokenId: TokenId, owner: string, name: string, level: number, description?: string, image?: string) => Promise<string>
   transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
   sendNft: (contract: string, token_id: TokenId, msg?: BinaryType) => Promise<string>
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
@@ -264,128 +264,128 @@ interface CW721Contract {
 
 const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
   const use = (contractAddress: string): CW721Instance => {
-/*    
-    const balance = async (account?: string): Promise<string> => {
-      const address = account || client.senderAddress;  
-      const result = await client.queryContractSmart(contractAddress, {balance: { address }});
-      return result.balance;
-    };
-*/
+    /*    
+        const balance = async (account?: string): Promise<string> => {
+          const address = account || client.senderAddress;  
+          const result = await client.queryContractSmart(contractAddress, {balance: { address }});
+          return result.balance;
+        };
+    */
     const allowance = async (owner: string, spender: string): Promise<AllowanceResponse> => {
-      return client.queryContractSmart(contractAddress, {allowance: { owner, spender }});
+      return client.queryContractSmart(contractAddress, { allowance: { owner, spender } });
     };
 
     const allAllowances = async (owner: string, startAfter?: string, limit?: number): Promise<AllAllowancesResponse> => {
-      return client.queryContractSmart(contractAddress, {all_allowances: { owner, start_after: startAfter, limit }});
+      return client.queryContractSmart(contractAddress, { all_allowances: { owner, start_after: startAfter, limit } });
     };
 
     const allAccounts = async (startAfter?: string, limit?: number): Promise<readonly string[]> => {
-      const accounts: AllAccountsResponse = await client.queryContractSmart(contractAddress, {all_accounts: { start_after: startAfter, limit }});
+      const accounts: AllAccountsResponse = await client.queryContractSmart(contractAddress, { all_accounts: { start_after: startAfter, limit } });
       return accounts.accounts;
     };
 
     const minter = async (): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {minter: { }});
+      return client.queryContractSmart(contractAddress, { minter: {} });
     };
 
     const contractInfo = async (): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {contract_info: { }});
+      return client.queryContractSmart(contractAddress, { contract_info: {} });
     };
 
     const nftInfo = async (token_id: TokenId): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {nft_info: { token_id }});
-    }  
+      return client.queryContractSmart(contractAddress, { nft_info: { token_id } });
+    }
 
     const allNftInfo = async (token_id: TokenId): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {all_nft_info: { token_id }});
-    } 
+      return client.queryContractSmart(contractAddress, { all_nft_info: { token_id } });
+    }
 
     // TODO: Need help here
     const ownerOf = async (token_id: TokenId): Promise<any> => {
-      return await client.queryContractSmart(contractAddress, {owner_of: {token_id}});
+      return await client.queryContractSmart(contractAddress, { owner_of: { token_id } });
     }
 
     const approvedForAll = async (owner: string, include_expired?: boolean, start_after?: string, limit?: number): Promise<any> => {
-      return await client.queryContractSmart(contractAddress, {approved_for_all: {owner, include_expired, start_after, limit}})
+      return await client.queryContractSmart(contractAddress, { approved_for_all: { owner, include_expired, start_after, limit } })
     }
-/*
-    const tokenInfo = async (): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {token_info: { }});
-    };
-*/
+    /*
+        const tokenInfo = async (): Promise<any> => {
+          return client.queryContractSmart(contractAddress, {token_info: { }});
+        };
+    */
     // mints tokens, returns ?
-    const mint = async (token_id: TokenId, owner: string, name:string, description?:string, image?:string): Promise<string> => {
-      const result = await client.execute(contractAddress, { mint: { token_id, owner, name, description, image }});
+    const mint = async (token_id: TokenId, owner: string, name: string, level: number, description?: string, image?: string): Promise<string> => {
+      const result = await client.execute(contractAddress, { mint: { token_id, owner, name, level, description, image } });
       return result.transactionHash;
     }
-   
+
     // transfers ownership, returns transactionHash
     const transferNft = async (recipient: string, token_id: TokenId): Promise<string> => {
-      const result = await client.execute(contractAddress, {transfer_nft: {recipient, token_id}});
+      const result = await client.execute(contractAddress, { transfer_nft: { recipient, token_id } });
       return result.transactionHash;
     }
 
     // sends an nft token to another contract (TODO: msg type any needs to be revisited once receiveNft is implemented)
     const sendNft = async (contract: string, token_id: TokenId, msg?: any): Promise<string> => {
-      const result = await client.execute(contractAddress, {send_nft: {contract, token_id, msg}})
+      const result = await client.execute(contractAddress, { send_nft: { contract, token_id, msg } })
       return result.transactionHash;
     }
 
     // total number of tokens issued
     const numTokens = async (): Promise<any> => {
-      return client.queryContractSmart(contractAddress, {num_tokens: { }});
+      return client.queryContractSmart(contractAddress, { num_tokens: {} });
     }
-    
+
     // list all token_ids that belong to a given owner
     const tokens = async (owner: string, start_after?: string, limit?: number): Promise<TokensResponse> => {
-      return client.queryContractSmart(contractAddress, {tokens: { owner, start_after, limit}});
+      return client.queryContractSmart(contractAddress, { tokens: { owner, start_after, limit } });
     }
 
     const allTokens = async (start_after?: string, limit?: number): Promise<TokensResponse> => {
-      return client.queryContractSmart(contractAddress, {all_tokens: { start_after, limit}});
+      return client.queryContractSmart(contractAddress, { all_tokens: { start_after, limit } });
     }
 
     const approve = async (spender: string, token_id: TokenId, expires?: Expiration): Promise<string> => {
-      const result = await client.execute(contractAddress, {approve: {spender, token_id, expires}});
+      const result = await client.execute(contractAddress, { approve: { spender, token_id, expires } });
       return result.transactionHash;
     }
 
     const approveAll = async (operator: string, expires?: Expiration): Promise<string> => {
-      const result = await client.execute(contractAddress, {approve_all: {operator, expires}})
+      const result = await client.execute(contractAddress, { approve_all: { operator, expires } })
       return result.transactionHash
     }
-    
+
     const revoke = async (spender: string, token_id: TokenId): Promise<string> => {
-      const result = await client.execute(contractAddress, {revoke: {spender, token_id}});
+      const result = await client.execute(contractAddress, { revoke: { spender, token_id } });
       return result.transactionHash;
     }
 
     const revokeAll = async (operator: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {revoke_all: {operator}})
+      const result = await client.execute(contractAddress, { revoke_all: { operator } })
       return result.transactionHash;
     }
-   /*
-    // burns tokens, returns transactionHash
-    const burn = async (amount: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {burn: {amount}});
-      return result.transactionHash;
-    }
-
-    const increaseAllowance = async (spender: string, amount: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {increase_allowance: {spender, amount}});
-      return result.transactionHash;
-    }
-
-    const decreaseAllowance = async (spender: string, amount: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {decrease_allowance: {spender, amount}});
-      return result.transactionHash;
-    }
-
-    const transferFrom = async (owner: string, recipient: string, amount: string): Promise<string> => {
-      const result = await client.execute(contractAddress, {transfer_from: {owner, recipient, amount}});
-      return result.transactionHash;
-    }
-    */
+    /*
+     // burns tokens, returns transactionHash
+     const burn = async (amount: string): Promise<string> => {
+       const result = await client.execute(contractAddress, {burn: {amount}});
+       return result.transactionHash;
+     }
+ 
+     const increaseAllowance = async (spender: string, amount: string): Promise<string> => {
+       const result = await client.execute(contractAddress, {increase_allowance: {spender, amount}});
+       return result.transactionHash;
+     }
+ 
+     const decreaseAllowance = async (spender: string, amount: string): Promise<string> => {
+       const result = await client.execute(contractAddress, {decrease_allowance: {spender, amount}});
+       return result.transactionHash;
+     }
+ 
+     const transferFrom = async (owner: string, recipient: string, amount: string): Promise<string> => {
+       const result = await client.execute(contractAddress, {transfer_from: {owner, recipient, amount}});
+       return result.transactionHash;
+     }
+     */
 
     return {
       contractAddress,
@@ -423,7 +423,7 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     }
     return r.data
   }
-  
+
   const upload = async (): Promise<number> => {
     const meta = {
       source: "https://github.com/CosmWasm/cosmwasm-plus/tree/v0.2.1/contracts/cw721-base",
@@ -436,9 +436,36 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
   }
 
   const instantiate = async (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string): Promise<CW721Instance> => {
-    const result = await client.instantiate(codeId, initMsg, label, { memo: `Init ${label}`, admin});
+    const result = await client.instantiate(codeId, initMsg, label, { memo: `Init ${label}`, admin });
     return use(result.contractAddress);
   }
 
   return { upload, instantiate, use };
 }
+
+/*
+const client = await useOptions(defaultOptions).setup("test");
+const partner = await useOptions(defaultOptions).setup("test", ".localnet2.key");
+
+const address = client.senderAddress;
+const partnerAddr = partner.senderAddress;
+
+const cw721 = CW721(client);
+
+client.getAccount()
+partner.getAccount()
+
+const codeId = 30;
+
+const initMsg = { name: "Cosmons", symbol: "mons",  minter: address };
+
+const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 1");
+
+const mine = cw721.use(contract.contractAddress);
+
+mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", "Minted Cosmon!");
+
+mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
+
+
+*/
