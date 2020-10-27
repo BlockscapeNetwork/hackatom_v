@@ -47,6 +47,10 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 ) -> Result<HandleResponse, ContractError> {
     match msg {
         HandleMsg::Mint(msg) => handle_mint(deps, env, info, msg),
+        HandleMsg::BattleMonster {
+            attacker_id,
+            defender_id,
+        } => handle_battle_monster(deps, env, info, attacker_id, defender_id),
         HandleMsg::Approve {
             spender,
             token_id,
@@ -71,6 +75,35 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     }
 }
 
+pub fn handle_battle_monster<S: Storage, A: Api, Q: Querier>(
+    deps: &mut Extern<S, A, Q>,
+    _env: Env,
+    _info: MessageInfo,
+    attacker_id: String,
+    defender_id: String,
+) -> Result<HandleResponse, ContractError> {
+    let mut info_attacker_id = tokens().load(&deps.storage, &attacker_id)?;
+    let mut info_defender_id = tokens().load(&deps.storage, &defender_id)?;
+    if info_attacker_id.level >= info_defender_id.level {
+        info_attacker_id.level += 2;
+        info_defender_id.level += 1;
+    } else {
+        info_attacker_id.level += 1;
+        info_defender_id.level += 2;
+    }
+    tokens().save(&mut deps.storage, &attacker_id, &info_attacker_id)?;
+    tokens().save(&mut deps.storage, &defender_id, &info_defender_id)?;
+    Ok(HandleResponse {
+        messages: vec![],
+        attributes: vec![
+            attr("action", "battle_monster"),
+            attr("attacker_id", attacker_id),
+            attr("defender_id", defender_id),
+        ],
+        data: None,
+    })
+}
+
 pub fn handle_mint<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     _env: Env,
@@ -89,6 +122,7 @@ pub fn handle_mint<S: Storage, A: Api, Q: Querier>(
         owner: deps.api.canonical_address(&msg.owner)?,
         approvals: vec![],
         name: msg.name,
+        level: msg.level,
         description: msg.description.unwrap_or_default(),
         image: msg.image,
     };
@@ -454,6 +488,7 @@ fn query_nft_info<S: Storage, A: Api, Q: Querier>(
     let info = tokens().load(&deps.storage, &token_id)?;
     Ok(NftInfoResponse {
         name: info.name,
+        level: info.level,
         description: info.description,
         image: info.image,
     })
@@ -556,6 +591,7 @@ fn query_all_nft_info<S: Storage, A: Api, Q: Querier>(
         },
         info: NftInfoResponse {
             name: info.name,
+            level: info.level,
             description: info.description,
             image: info.image,
         },
@@ -652,6 +688,7 @@ mod tests {
             token_id: token_id.clone(),
             owner: "medusa".into(),
             name: name.clone(),
+            level: 1,
             description: Some(description.clone()),
             image: None,
         });
@@ -681,6 +718,7 @@ mod tests {
             info,
             NftInfoResponse {
                 name: name.clone(),
+                level: 1,
                 description: description.clone(),
                 image: None,
             }
@@ -701,6 +739,7 @@ mod tests {
             token_id: token_id.clone(),
             owner: "hercules".into(),
             name: "copy cat".into(),
+            level: 1,
             description: None,
             image: None,
         });
@@ -732,6 +771,7 @@ mod tests {
             token_id: token_id.clone(),
             owner: "venus".into(),
             name: name.clone(),
+            level: 1,
             description: Some(description.clone()),
             image: None,
         });
@@ -791,6 +831,7 @@ mod tests {
             token_id: token_id.clone(),
             owner: "venus".into(),
             name: name.clone(),
+            level: 1,
             description: Some(description.clone()),
             image: None,
         });
@@ -851,6 +892,7 @@ mod tests {
             token_id: token_id.clone(),
             owner: "demeter".into(),
             name: name.clone(),
+            level: 1,
             description: Some(description.clone()),
             image: None,
         });
@@ -947,6 +989,7 @@ mod tests {
             token_id: token_id1.clone(),
             owner: "demeter".into(),
             name: name1.clone(),
+            level: 1,
             description: Some(description1.clone()),
             image: None,
         });
@@ -958,6 +1001,7 @@ mod tests {
             token_id: token_id2.clone(),
             owner: "demeter".into(),
             name: name2.clone(),
+            level: 1,
             description: Some(description2.clone()),
             image: None,
         });
@@ -1118,6 +1162,7 @@ mod tests {
             token_id: token_id1.clone(),
             owner: demeter.clone(),
             name: "Growing power".to_string(),
+            level: 1,
             description: Some("Allows the owner the power to grow anything".to_string()),
             image: None,
         });
@@ -1127,6 +1172,7 @@ mod tests {
             token_id: token_id2.clone(),
             owner: ceres.clone(),
             name: "More growing power".to_string(),
+            level: 1,
             description: Some(
                 "Allows the owner the power to grow anything even faster".to_string(),
             ),
@@ -1138,6 +1184,7 @@ mod tests {
             token_id: token_id3.clone(),
             owner: demeter.clone(),
             name: "Sing a lullaby".to_string(),
+            level: 1,
             description: Some("Calm even the most excited children".to_string()),
             image: None,
         });
