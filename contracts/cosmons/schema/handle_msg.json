@@ -70,14 +70,14 @@
         "battle_monster": {
           "type": "object",
           "required": [
-            "token_id0",
-            "token_id1"
+            "attacker_id",
+            "defender_id"
           ],
           "properties": {
-            "token_id0": {
+            "attacker_id": {
               "type": "string"
             },
-            "token_id1": {
+            "defender_id": {
               "type": "string"
             }
           }

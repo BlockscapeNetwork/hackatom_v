@@ -236,7 +236,7 @@ interface CW721Instance {
 
   // actions
   mint: (tokenId: TokenId, owner: string, name: string, level: number, description?: string, image?: string) => Promise<string>
-  battleMonster: (token_id0: TokenId, token_id1: TokenId) => Promise<any>
+  battleMonster: (attacker_id: TokenId, defender_id: TokenId) => Promise<any>
   transferNft: (recipient: string, tokenId: TokenId) => Promise<string>
   sendNft: (contract: string, token_id: TokenId, msg?: BinaryType) => Promise<string>
   approve: (spender: string, tokenId: TokenId, expires?: Expiration) => Promise<string>
@@ -321,8 +321,8 @@ const CW721 = (client: SigningCosmWasmClient): CW721Contract => {
     }
 
     // battle Monster
-    const battleMonster = async (token_id0: TokenId, token_id1: TokenId): Promise<string> => {
-      const result = await client.execute(contractAddress, { battle_monster: { token_id0, token_id1 } });
+    const battleMonster = async (attacker_id: TokenId, defender_id: TokenId): Promise<string> => {
+      const result = await client.execute(contractAddress, { battle_monster: { attacker_id, defender_id } });
       return result.transactionHash;
     }
 
@@ -471,15 +471,21 @@ const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 1");
 
 const mine = cw721.use(contract.contractAddress);
 
+continue or stop here and jump to 2) 
+
 mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", "Minted Cosmon!");
 
 mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
 
 
 ----
+2)
 
 mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", 20, "Minted Cosmon!");
 mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx", address, "Cosmos", 25, "Minted Cosmon!");
+
+mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
+mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx")
 
 mine.battleMonster("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb","monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx");
 

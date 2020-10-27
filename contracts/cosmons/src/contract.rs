@@ -48,9 +48,9 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     match msg {
         HandleMsg::Mint(msg) => handle_mint(deps, env, info, msg),
         HandleMsg::BattleMonster {
-            token_id0,
-            token_id1,
-        } => handle_battle_monster(deps, env, info, token_id0, token_id1),
+            attacker_id,
+            defender_id,
+        } => handle_battle_monster(deps, env, info, attacker_id, defender_id),
         HandleMsg::Approve {
             spender,
             token_id,
@@ -79,26 +79,26 @@ pub fn handle_battle_monster<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     _env: Env,
     _info: MessageInfo,
-    token_id0: String,
-    token_id1: String,
+    attacker_id: String,
+    defender_id: String,
 ) -> Result<HandleResponse, ContractError> {
-    let mut info_token_id0 = tokens().load(&deps.storage, &token_id0)?;
-    let mut info_token_id1 = tokens().load(&deps.storage, &token_id1)?;
-    if info_token_id0.level >= info_token_id1.level {
-        info_token_id0.level += 2;
-        info_token_id1.level += 1;
+    let mut info_attacker_id = tokens().load(&deps.storage, &attacker_id)?;
+    let mut info_defender_id = tokens().load(&deps.storage, &defender_id)?;
+    if info_attacker_id.level >= info_defender_id.level {
+        info_attacker_id.level += 2;
+        info_defender_id.level += 1;
     } else {
-        info_token_id0.level += 1;
-        info_token_id1.level += 2;
+        info_attacker_id.level += 1;
+        info_defender_id.level += 2;
     }
-    tokens().save(&mut deps.storage, &token_id0, &info_token_id0)?;
-    tokens().save(&mut deps.storage, &token_id1, &info_token_id1)?;
+    tokens().save(&mut deps.storage, &attacker_id, &info_attacker_id)?;
+    tokens().save(&mut deps.storage, &defender_id, &info_defender_id)?;
     Ok(HandleResponse {
         messages: vec![],
         attributes: vec![
             attr("action", "battle_monster"),
-            attr("token_id0", token_id0),
-            attr("token_id1", token_id1),
+            attr("attacker_id", attacker_id),
+            attr("defender_id", defender_id),
         ],
         data: None,
     })
