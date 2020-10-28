@@ -1,7 +1,7 @@
-use crate::state::{offerings, Offering, OFFERINGS, OFFERINGS_COUNT, increment_offerings, State};
+use crate::state::{increment_offerings, offerings, Offering, State, OFFERINGS, OFFERINGS_COUNT};
 use cosmwasm_std::{
-    attr, to_binary, from_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Order, Querier,
-    StdResult, Storage,
+    attr, from_binary, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse,
+    MessageInfo, Order, Querier, StdResult, Storage,
 };
 use cw_storage_plus::Bound;
 
@@ -50,9 +50,7 @@ pub fn try_receive<S: Storage, A: Api, Q: Querier>(
         None => Err(ContractError::NoData {}),
     }?;
     match msg {
-        ReceiveMsg::SellNft {
-            list_price,
-        } => try_sell_nft(deps, info, wrapper, list_price),
+        ReceiveMsg::SellNft { list_price } => try_sell_nft(deps, info, wrapper, list_price),
         ReceiveMsg::BuyNft { token_id } => try_buy_nft(deps, info, token_id),
     }
 }
@@ -64,7 +62,6 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
     list_price: Cw20CoinHuman,
 ) -> Result<HandleResponse, ContractError> {
     // check if same token Id form same original contract is already on sale
-    
     // get OFFERING_COUNT
     let id = increment_offerings(&mut deps.storage)?.to_string();
 
@@ -76,11 +73,11 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
         list_price: list_price,
     };
 
-    OFFERINGS.save(&mut deps.storage, &id, &off);
+    OFFERINGS.save(&mut deps.storage, &id, &off)?;
 
     let priceString = format!("{} {}", list_price.amount, list_price.address);
 
-    Ok(HandleResponse{
+    Ok(HandleResponse {
         messages: Vec::new(),
         attributes: vec![
             attr("action", "sell_nft"),
@@ -106,7 +103,20 @@ pub fn try_withdraw<S: Storage, A: Api, Q: Querier>(
     info: MessageInfo,
     token_id: String,
 ) -> Result<HandleResponse, ContractError> {
-    Ok(HandleResponse::default())
+    // check if token_id is currently sold by the requesting address
+    let off = OFFERINGS.load(&deps.storage, &token_id)?;
+    if off.seller == info.sender {
+        return Ok(HandleResponse {
+            messages: Vec::new(),
+            attributes: vec![
+                attr("action", "withdraw_nft"),
+                attr("seller", info.sender),
+                attr("token_id", token_id),
+            ],
+            data: None,
+        });
+    }
+    Err(ContractError::Unauthorized {})
 }
 
 pub fn query<S: Storage, A: Api, Q: Querier>(
@@ -123,7 +133,7 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 
 fn query_offerings<S: Storage, A: Api, Q: Querier>(
     deps: &Extern<S, A, Q>,
-) /*-> StdResult<OfferingsResponse>*/ {
+) -> StdResult<OfferingsResponse> {
     // let offs: StdResult<Vec<Offering>> = offerings::<S>()
     //     .range(&deps.storage, None, None, Order::Ascending)
     //     .map(|item| item.map(|(k, _)| String::from_utf8_lossy(&k).to_string()))
@@ -134,7 +144,9 @@ fn query_offerings<S: Storage, A: Api, Q: Querier>(
     //     .map(|item| item.map(|(k, _)| String::from_utf8_lossy(&k).to_string()))
     //     .collect();
 
-    //Ok(OfferingsResponse {})
+    Ok(OfferingsResponse {
+        offerings: Vec::new(), // Placeholder
+    })
 }
 
 // ============================== Test ==============================

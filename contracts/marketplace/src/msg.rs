@@ -19,12 +19,8 @@ pub enum HandleMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ReceiveMsg {
-    SellNft {
-        list_price: Cw20CoinHuman,
-    },
-    BuyNft {
-        token_id: String,
-    },
+    SellNft { list_price: Cw20CoinHuman },
+    BuyNft { token_id: String },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CanonicalAddr, StdResult, Storage, HumanAddr};
+use cosmwasm_std::{CanonicalAddr, HumanAddr, StdResult, Storage};
 use cw20::Cw20CoinHuman;
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
