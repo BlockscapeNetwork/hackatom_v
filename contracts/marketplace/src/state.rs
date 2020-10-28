@@ -25,7 +25,7 @@ pub struct Offering {
 }
 
 /// OFFERINGS is a map which maps the offering_id to an offering. Offering_id is derived from OFFERINGS_COUNT.
-pub const OFFERINGS: Map<&u64, Offering> = Map::new(b"offerings");
+pub const OFFERINGS: Map<&str, Offering> = Map::new(b"offerings");
 
 pub const OFFERINGS_COUNT: Item<u64> = Item::new(b"num_offerings");
 
