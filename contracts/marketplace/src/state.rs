@@ -24,7 +24,8 @@ pub struct Offering {
     pub list_price: Cw20CoinHuman,
 }
 
-pub const OFFERINGS: Map<(&[u8], &[u8]), Offering> = Map::new(b"offerings");
+/// OFFERINGS is a map which maps the offering_id to an offering. Offering_id is derived from OFFERINGS_COUNT.
+pub const OFFERINGS: Map<&[u8], Offering> = Map::new(b"offerings");
 
 pub const OFFERINGS_COUNT: Item<u64> = Item::new(b"num_offerings");
 
@@ -50,7 +51,7 @@ impl<'a, S: Storage> IndexList<S, Offering> for OfferingIndexes<'a, S> {
     }
 }
 
-pub fn offerings<'a, S: Storage>() -> IndexedMap<'a, &'a str, Offering, S, OfferingIndexes<'a, S>> {
+pub fn offerings<'a, S: Storage>() -> IndexedMap<'a, &'a [u8], Offering, S, OfferingIndexes<'a, S>> {
     let indexes = OfferingIndexes {
         seller: MultiIndex::new(|o| o.seller.to_vec(), b"offerings", b"offerings__seller"),
         contract: MultiIndex::new(
