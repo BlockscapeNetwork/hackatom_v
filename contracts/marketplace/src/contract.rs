@@ -1,3 +1,7 @@
+use crate::msg::BuyNft;
+use cw20::Cw20ReceiveMsg;
+use crate::msg::SellNft;
+use crate::msg::ReceiveMsgWrapper;
 use crate::state::{increment_offerings, offerings, Offering, State, OFFERINGS, OFFERINGS_COUNT};
 use cosmwasm_std::{
     attr, from_binary, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse,
@@ -6,7 +10,7 @@ use cosmwasm_std::{
 use cw_storage_plus::Bound;
 
 use crate::error::ContractError;
-use crate::msg::{HandleMsg, InitMsg, OfferingsResponse, QueryMsg, ReceiveMsg};
+use crate::msg::{HandleMsg, InitMsg, OfferingsResponse, QueryMsg};
 use cw20::Cw20CoinHuman;
 use cw721::Cw721ReceiveMsg;
 
@@ -43,15 +47,11 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 pub fn try_receive<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
-    wrapper: Cw721ReceiveMsg,
+    wrapper: ReceiveMsgWrapper,
 ) -> Result<HandleResponse, ContractError> {
-    let msg: ReceiveMsg = match wrapper.msg {
-        Some(bin) => Ok(from_binary(&bin)?),
-        None => Err(ContractError::NoData {}),
-    }?;
-    match msg {
-        ReceiveMsg::SellNft { list_price } => try_sell_nft(deps, info, wrapper, list_price),
-        ReceiveMsg::BuyNft { token_id } => try_buy_nft(deps, info, token_id),
+    match wrapper {
+        ReceiveMsgWrapper::Cw20Rcv(msg) => try_buy_nft(deps, info, msg),
+        ReceiveMsgWrapper::Cw721Rcv(msg) => try_sell_nft(deps, info, msg),
     }
 }
 
@@ -59,8 +59,12 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
     rcvMsg: Cw721ReceiveMsg,
-    list_price: Cw20CoinHuman,
 ) -> Result<HandleResponse, ContractError> {
+    let msg: SellNft = match rcvMsg.msg {
+        Some(bin) => Ok(from_binary(&bin)?),
+        None => Err(ContractError::NoData {}),
+    }?;
+
     // check if same token Id form same original contract is already on sale
     // get OFFERING_COUNT
     let id = increment_offerings(&mut deps.storage)?.to_string();
@@ -70,12 +74,12 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
         contract_addr: info.sender,
         token_id: rcvMsg.token_id,
         seller: rcvMsg.sender,
-        list_price: list_price,
+        list_price: msg.list_price,
     };
 
     OFFERINGS.save(&mut deps.storage, &id, &off)?;
 
-    let priceString = format!("{} {}", list_price.amount, list_price.address);
+    let priceString = format!("{} {}", msg.list_price.amount, msg.list_price.address);
 
     Ok(HandleResponse {
         messages: Vec::new(),
@@ -93,8 +97,19 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
 pub fn try_buy_nft<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
-    token_id: String,
+    rcvMsg: Cw20ReceiveMsg,
 ) -> Result<HandleResponse, ContractError> {
+    let msg: BuyNft = match rcvMsg.msg {
+        Some(bin) => Ok(from_binary(&bin)?),
+        None => Err(ContractError::NoData {}),
+    }?;
+
+    // check if offering exists
+    // check for enough coins
+    // if everything is fine transfer cw20 to seller
+    // transfer nft to buyer
+    //delete offering
+
     Ok(HandleResponse::default())
 }
 

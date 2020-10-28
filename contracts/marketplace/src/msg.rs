@@ -1,3 +1,5 @@
+use cw20::Cw20ReceiveMsg;
+use cosmwasm_std::WasmMsg;
 use crate::state::Offering;
 use cw20::Cw20CoinHuman;
 use cw721::Cw721ReceiveMsg;
@@ -13,14 +15,26 @@ pub struct InitMsg {
 #[serde(rename_all = "snake_case")]
 pub enum HandleMsg {
     WithdrawNft { token_id: String },
-    Receive(Cw721ReceiveMsg),
+    Receive(ReceiveMsgWrapper),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub enum ReceiveMsg {
-    SellNft { list_price: Cw20CoinHuman },
-    BuyNft { token_id: String },
+pub enum ReceiveMsgWrapper {
+    Cw20Rcv(Cw20ReceiveMsg),
+    Cw721Rcv(Cw721ReceiveMsg),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct SellNft {
+    pub list_price: Cw20CoinHuman
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct BuyNft {
+    pub token_id: String
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
