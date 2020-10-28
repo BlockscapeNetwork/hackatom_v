@@ -39,26 +39,26 @@ pub fn increment_offerings<S: Storage>(storage: &mut S) -> StdResult<u64> {
     Ok(val)
 }
 
-// pub struct OfferingIndexes<'a, S: Storage> {
-//     pub seller: MultiIndex<'a, S, Offering>,
-//     pub contract: MultiIndex<'a, S, Offering>,
-// }
+pub struct OfferingIndexes<'a, S: Storage> {
+    pub seller: MultiIndex<'a, S, Offering>,
+    pub contract: MultiIndex<'a, S, Offering>,
+}
 
-// impl<'a, S: Storage> IndexList<S, Offering> for OfferingIndexes<'a, S> {
-//     fn get_indexes(&'_ self) -> Box<dyn Iterator<Item = &'_ dyn Index<S, Offering>> + '_> {
-//         let v: Vec<&dyn Index<S, Offering>> = vec![&self.seller, &self.contract];
-//         Box::new(v.into_iter())
-//     }
-// }
+impl<'a, S: Storage> IndexList<S, Offering> for OfferingIndexes<'a, S> {
+    fn get_indexes(&'_ self) -> Box<dyn Iterator<Item = &'_ dyn Index<S, Offering>> + '_> {
+        let v: Vec<&dyn Index<S, Offering>> = vec![&self.seller, &self.contract];
+        Box::new(v.into_iter())
+    }
+}
 
-// pub fn offerings<'a, S: Storage>() -> IndexedMap<'a, &'a [u8], Offering, S, OfferingIndexes<'a, S>> {
-//     let indexes = OfferingIndexes {
-//         seller: MultiIndex::new(|o| o.seller.to_vec(), b"offerings", b"offerings__seller"),
-//         contract: MultiIndex::new(
-//             |o| o.contract_addr.to_vec(),
-//             b"offerings",
-//             b"offerings__contract",
-//         ),
-//     };
-//     IndexedMap::new(b"offerings", indexes)
-// }
+pub fn offerings<'a, S: Storage>() -> IndexedMap<'a, &'a str, Offering, S, OfferingIndexes<'a, S>> {
+    let indexes = OfferingIndexes {
+        seller: MultiIndex::new(|o| o.seller.to_vec(), b"offerings", b"offerings__seller"),
+        contract: MultiIndex::new(
+            |o| o.contract_addr.to_vec(),
+            b"offerings",
+            b"offerings__contract",
+        ),
+    };
+    IndexedMap::new(b"offerings", indexes)
+}
