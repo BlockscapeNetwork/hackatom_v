@@ -1,17 +1,17 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CanonicalAddr, Coin, Storage, StdResult};
-use cw_storage_plus::{Map, Item, IndexedMap, Index, IndexList, MultiIndex};
+use cosmwasm_std::{CanonicalAddr, StdResult, Storage};
+use cw20::Cw20CoinHuman;
+use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
 pub static CONFIG_KEY: &[u8] = b"config";
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct State {
-    pub count: i32,
+    pub marketplace_name: String,
     pub owner: CanonicalAddr,
 }
-
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct Offering {
@@ -21,7 +21,7 @@ pub struct Offering {
 
     pub seller: CanonicalAddr,
 
-    pub list_price: Coin,
+    pub list_price: Cw20CoinHuman,
 }
 
 pub const OFFERINGS: Map<(&[u8], &[u8]), Offering> = Map::new(b"offerings");
@@ -40,7 +40,7 @@ pub fn increment_offerings<S: Storage>(storage: &mut S) -> StdResult<u64> {
 
 pub struct OfferingIndexes<'a, S: Storage> {
     pub seller: MultiIndex<'a, S, Offering>,
-    pub contract: MultiIndex<'a, S, Offering>
+    pub contract: MultiIndex<'a, S, Offering>,
 }
 
 impl<'a, S: Storage> IndexList<S, Offering> for OfferingIndexes<'a, S> {
@@ -53,7 +53,11 @@ impl<'a, S: Storage> IndexList<S, Offering> for OfferingIndexes<'a, S> {
 pub fn offerings<'a, S: Storage>() -> IndexedMap<'a, &'a str, Offering, S, OfferingIndexes<'a, S>> {
     let indexes = OfferingIndexes {
         seller: MultiIndex::new(|o| o.seller.to_vec(), b"offerings", b"offerings__seller"),
-        contract: MultiIndex::new(|o| o.contract_addr.to_vec(), b"offerings", b"offerings__contract"),
+        contract: MultiIndex::new(
+            |o| o.contract_addr.to_vec(),
+            b"offerings",
+            b"offerings__contract",
+        ),
     };
     IndexedMap::new(b"offerings", indexes)
 }
