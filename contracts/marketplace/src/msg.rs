@@ -20,7 +20,6 @@ pub enum HandleMsg {
 #[serde(rename_all = "snake_case")]
 pub enum ReceiveMsg {
     SellNft {
-        token_id: String,
         list_price: Cw20CoinHuman,
     },
     BuyNft {

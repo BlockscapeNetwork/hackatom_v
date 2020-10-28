@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CanonicalAddr, StdResult, Storage};
+use cosmwasm_std::{CanonicalAddr, StdResult, Storage, HumanAddr};
 use cw20::Cw20CoinHuman;
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
@@ -17,9 +17,9 @@ pub struct State {
 pub struct Offering {
     pub token_id: String,
 
-    pub contract_addr: CanonicalAddr,
+    pub contract_addr: HumanAddr,
 
-    pub seller: CanonicalAddr,
+    pub seller: HumanAddr,
 
     pub list_price: Cw20CoinHuman,
 }
