@@ -1,5 +1,5 @@
 use crate::state::Offering;
-use cosmwasm_std::WasmMsg;
+use cosmwasm_std::HumanAddr;
 use cw20::{Cw20CoinHuman, Cw20ReceiveMsg};
 use cw721::Cw721ReceiveMsg;
 use schemars::JsonSchema;
@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InitMsg {
     pub marketplace_name: String,
+    pub symbol: String,
+    pub minter: HumanAddr,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

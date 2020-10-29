@@ -1,17 +1,12 @@
+use cw721::ContractInfoResponse;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::{CanonicalAddr, HumanAddr, StdResult, Storage};
+use cosmwasm_std::{CanonicalAddr, StdResult, Storage};
 use cw20::Cw20CoinHuman;
 use cw_storage_plus::{Index, IndexList, IndexedMap, Item, Map, MultiIndex};
 
 pub static CONFIG_KEY: &[u8] = b"config";
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct State {
-    pub marketplace_name: String,
-    pub owner: CanonicalAddr,
-}
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct Offering {
@@ -26,8 +21,8 @@ pub struct Offering {
 
 /// OFFERINGS is a map which maps the offering_id to an offering. Offering_id is derived from OFFERINGS_COUNT.
 pub const OFFERINGS: Map<&str, Offering> = Map::new(b"offerings");
-
 pub const OFFERINGS_COUNT: Item<u64> = Item::new(b"num_offerings");
+pub const CONTRACT_INFO: Item<ContractInfoResponse> = Item::new(b"marketplace_info");
 
 pub fn num_offerings<S: Storage>(storage: &S) -> StdResult<u64> {
     Ok(OFFERINGS_COUNT.may_load(storage)?.unwrap_or_default())
