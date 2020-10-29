@@ -48,7 +48,7 @@ docker run --rm -v "$(pwd)":/code \
 wasmcli tx wasm store marketplace.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
 ```
 
-Use `wasmcli query wasm list-code` to find out your contract ID (`id`) and address (`creator`). Once you have the ID, you can also just use `wasmcli query wasm list-contract-by-code <ID>`.
+Use `wasmcli query wasm list-code` to find out your contract ID (`id`) and address (`creator`).
 
 Example output:
 
