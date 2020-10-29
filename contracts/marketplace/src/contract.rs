@@ -166,12 +166,11 @@ fn query_offerings<S: Storage, A: Api, Q: Querier>(
 
 #[cfg(test)]
 mod tests {
-    use cosmwasm_std::Uint128;
-use cosmwasm_std::HumanAddr;
-use crate::msg::ReceiveMsgWrapper::Cw721Rcv;
-use super::*;
+    use cw20::Cw20CoinHuman;
+    use crate::msg::ReceiveMsgWrapper::Cw721Rcv;
+    use super::*;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, from_binary};
+    use cosmwasm_std::{coins, from_binary, Uint128, HumanAddr};
 
 //     #[test]
 //     fn proper_initialization() {
