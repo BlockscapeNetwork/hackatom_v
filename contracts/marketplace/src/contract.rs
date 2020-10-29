@@ -1,29 +1,29 @@
-use crate::state::{increment_offerings, Offering, State, OFFERINGS, OFFERINGS_COUNT};
+use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
 use cosmwasm_std::{
     attr, from_binary, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse,
-    MessageInfo, Order, Querier, StdResult, Storage,
+    MessageInfo, Querier, StdResult, Storage,
 };
-use cw20::{Cw20CoinHuman, Cw20ReceiveMsg};
-use cw_storage_plus::Bound;
+use cw20::Cw20ReceiveMsg;
+use cw721::{ContractInfoResponse, Cw721ReceiveMsg};
 
 use crate::error::ContractError;
 use crate::msg::{
     BuyNft, HandleMsg, InitMsg, OfferingsResponse, QueryMsg, ReceiveMsgWrapper, SellNft,
 };
-use cw721::Cw721ReceiveMsg;
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
 pub fn init<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     _env: Env,
-    info: MessageInfo,
+    _info: MessageInfo,
     msg: InitMsg,
 ) -> StdResult<InitResponse> {
-    let state = State {
-        marketplace_name: msg.marketplace_name,
-        owner: deps.api.canonical_address(&info.sender)?,
+    let info = ContractInfoResponse {
+        name: msg.marketplace_name,
+        symbol: msg.symbol,
     };
+    CONTRACT_INFO.save(&mut deps.storage, &info)?;
     Ok(InitResponse::default())
 }
 
@@ -56,9 +56,9 @@ pub fn try_receive<S: Storage, A: Api, Q: Querier>(
 pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
-    rcvMsg: Cw721ReceiveMsg,
+    rcv_msg: Cw721ReceiveMsg,
 ) -> Result<HandleResponse, ContractError> {
-    let msg: SellNft = match rcvMsg.msg {
+    let msg: SellNft = match rcv_msg.msg {
         Some(bin) => Ok(from_binary(&bin)?),
         None => Err(ContractError::NoData {}),
     }?;
@@ -70,14 +70,14 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
     // save Offering
     let off = Offering {
         contract_addr: deps.api.canonical_address(&info.sender)?,
-        token_id: rcvMsg.token_id,
-        seller: deps.api.canonical_address(&rcvMsg.sender)?,
+        token_id: rcv_msg.token_id,
+        seller: deps.api.canonical_address(&rcv_msg.sender)?,
         list_price: msg.list_price.clone(),
     };
 
     OFFERINGS.save(&mut deps.storage, &id, &off)?;
 
-    let priceString = format!("{} {}", msg.list_price.amount, msg.list_price.address);
+    let price_string = format!("{} {}", msg.list_price.amount, msg.list_price.address);
 
     Ok(HandleResponse {
         messages: Vec::new(),
@@ -85,7 +85,7 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
             attr("action", "sell_nft"),
             attr("original_contract", info.sender),
             attr("seller", off.seller),
-            attr("list_price", priceString),
+            attr("list_price", price_string),
             attr("token_id", off.token_id),
         ],
         data: None,
@@ -93,11 +93,11 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
 }
 
 pub fn try_buy_nft<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    info: MessageInfo,
-    rcvMsg: Cw20ReceiveMsg,
+    _deps: &mut Extern<S, A, Q>,
+    _info: MessageInfo,
+    rcv_msg: Cw20ReceiveMsg,
 ) -> Result<HandleResponse, ContractError> {
-    let msg: BuyNft = match rcvMsg.msg {
+    let _msg: BuyNft = match rcv_msg.msg {
         Some(bin) => Ok(from_binary(&bin)?),
         None => Err(ContractError::NoData {}),
     }?;
@@ -145,7 +145,7 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 // ============================== Query Handlers ==============================
 
 fn query_offerings<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
+    _deps: &Extern<S, A, Q>,
 ) -> StdResult<OfferingsResponse> {
     // let offs: StdResult<Vec<Offering>> = offerings::<S>()
     //     .range(&deps.storage, None, None, Order::Ascending)
