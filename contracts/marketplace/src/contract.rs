@@ -1,16 +1,16 @@
-use crate::package::ContractInfoResponse;
+use crate::package::{ContractInfoResponse, OfferingsResponse, QueryOfferingsResult};
 use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
+use cosmwasm_std::KV;
 use cosmwasm_std::{
     attr, from_binary, to_binary, Api, Binary, CosmosMsg, Env, Extern, HandleResponse,
-    InitResponse, MessageInfo, Querier, StdResult, Storage, WasmMsg,
+    InitResponse, MessageInfo, Order, Querier, StdResult, Storage, WasmMsg,
 };
 use cw20::{Cw20HandleMsg, Cw20ReceiveMsg};
 use cw721::{Cw721HandleMsg, Cw721ReceiveMsg};
+use std::str::from_utf8;
 
 use crate::error::ContractError;
-use crate::msg::{
-    BuyNft, HandleMsg, InitMsg, OfferingsResponse, QueryMsg, ReceiveMsgWrapper, SellNft,
-};
+use crate::msg::{BuyNft, HandleMsg, InitMsg, QueryMsg, ReceiveMsgWrapper, SellNft};
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -192,20 +192,31 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 // ============================== Query Handlers ==============================
 
 fn query_offerings<S: Storage, A: Api, Q: Querier>(
-    _deps: &Extern<S, A, Q>,
+    deps: &Extern<S, A, Q>,
 ) -> StdResult<OfferingsResponse> {
-    // let offs: StdResult<Vec<Offering>> = offerings::<S>()
-    //     .range(&deps.storage, None, None, Order::Ascending)
-    //     .map(|item| item.map(|(k, _)| String::from_utf8_lossy(&k).to_string()))
-    //     .collect();
-
-    // let offs: StdResult<Vec<Offering>> = offerings::<S>()
-    //     .range(&deps.storage, None, None, Order::Ascending)
-    //     .map(|item| item.map(|(k, _)| String::from_utf8_lossy(&k).to_string()))
-    //     .collect();
+    let res: StdResult<Vec<QueryOfferingsResult>> = OFFERINGS
+        .range(&deps.storage, None, None, Order::Ascending)
+        .map(|kv_item| parse_offering(deps.api, kv_item))
+        .collect();
 
     Ok(OfferingsResponse {
-        offerings: Vec::new(), // Placeholder
+        offerings: res?, // Placeholder
+    })
+}
+
+fn parse_offering<A: Api>(
+    api: A,
+    item: StdResult<KV<Offering>>,
+) -> StdResult<QueryOfferingsResult> {
+    item.and_then(|(k, offering)| {
+        let id = from_utf8(&k)?;
+        Ok(QueryOfferingsResult {
+            id: id.to_string(),
+            token_id: offering.token_id,
+            list_price: offering.list_price,
+            contract_addr: api.human_address(&offering.contract_addr)?,
+            seller: api.human_address(&offering.seller)?,
+        })
     })
 }
 

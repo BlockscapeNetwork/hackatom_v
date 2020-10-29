@@ -1,4 +1,3 @@
-use crate::state::Offering;
 use cw20::{Cw20CoinHuman, Cw20ReceiveMsg};
 use cw721::Cw721ReceiveMsg;
 use schemars::JsonSchema;
@@ -40,9 +39,4 @@ pub struct BuyNft {
 pub enum QueryMsg {
     // GetOfferings returns a list of all offerings
     GetOfferings {},
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct OfferingsResponse {
-    pub offerings: Vec<Offering>,
 }
