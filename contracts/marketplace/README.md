@@ -8,7 +8,7 @@ This smart contract enables trading of cw721 NFT tokens. To accomplish this the 
 |:------------------------------------|:--------------------------------------------------------------------------------------|:------------------:|
 | `receiveNft(sender, token_id, msg)` | Counter-part to `sendNft`, handling the receival of a token in the receiving contract | :white_check_mark: |
 | `sellNft(list_price)`               | Sells a token for a specified price                                                   | :white_check_mark: |
-| `buyNft(token_id)`                  | Buys a token for the price it has been put up for sale                                | :x:                |
+| `buyNft(token_id)`                  | Buys a token for the price it has been put up for sale                                | :white_check_mark: |
 | `withdrawNft(token_id)`             | Withdraws a token offering                                                            | :white_check_mark: |
 
 ## Queries
