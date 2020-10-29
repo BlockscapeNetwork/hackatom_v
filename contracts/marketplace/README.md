@@ -1,6 +1,6 @@
 # Marketplace Smart Contract
 
-This smart contract enables trading of cw721 NFT tokens. To accomplish this the contract implements a *receiveNft* function which acts as a counterpart to the cw721 *sendNft* function. It also provides further functions for trading.
+This smart contract enables selling cw721 NFT tokens. To accomplish this the contract implements a *receiveNft* function which acts as a counterpart to the cw721 *sendNft* function. It also provides further functions for trading.
 
 ## Messages
 
@@ -23,7 +23,7 @@ In total, we will be needing three contracts: `cw20-base` for buying tokens, `cw
 
 ### Create Account(s)
 
-**If you already have account(s) with funds, you can skip this step.**
+**If you already have accounts with funds, you can skip this step.**
 
 ```shell
 wasmcli keys add client --keyring-backend test
