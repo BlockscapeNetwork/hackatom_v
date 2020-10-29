@@ -166,87 +166,87 @@ fn query_offerings<S: Storage, A: Api, Q: Querier>(
 
 #[cfg(test)]
 mod tests {
-    use cw20::Cw20CoinHuman;
-    use crate::msg::ReceiveMsgWrapper::Cw721Rcv;
     use super::*;
+    use crate::msg::ReceiveMsgWrapper::Cw721Rcv;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, from_binary, Uint128, HumanAddr};
+    use cosmwasm_std::{coins, from_binary, HumanAddr, Uint128};
+    use cw20::Cw20CoinHuman;
 
-//     #[test]
-//     fn proper_initialization() {
-//         let mut deps = mock_dependencies(&[]);
+    //     #[test]
+    //     fn proper_initialization() {
+    //         let mut deps = mock_dependencies(&[]);
 
-//         let msg = InitMsg { count: 17 };
-//         let info = mock_info("creator", &coins(1000, "earth"));
+    //         let msg = InitMsg { count: 17 };
+    //         let info = mock_info("creator", &coins(1000, "earth"));
 
-//         // we can just call .unwrap() to assert this was a success
-//         let res = init(&mut deps, mock_env(), info, msg).unwrap();
-//         assert_eq!(0, res.messages.len());
+    //         // we can just call .unwrap() to assert this was a success
+    //         let res = init(&mut deps, mock_env(), info, msg).unwrap();
+    //         assert_eq!(0, res.messages.len());
 
-//         // it worked, let's query the state
-//         let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-//         let value: CountResponse = from_binary(&res).unwrap();
-//         assert_eq!(17, value.count);
-//     }
+    //         // it worked, let's query the state
+    //         let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
+    //         let value: CountResponse = from_binary(&res).unwrap();
+    //         assert_eq!(17, value.count);
+    //     }
 
-        #[test]
-        fn post_offering() {
-            let mut deps = mock_dependencies(&coins(2, "token"));
+    #[test]
+    fn post_offering() {
+        let mut deps = mock_dependencies(&coins(2, "token"));
 
-            let msg = InitMsg { 
-                marketplace_name: String::from("test market"),
-             };
-            let info = mock_info("creator", &coins(2, "token"));
-            let _res = init(&mut deps, mock_env(), info, msg).unwrap();
+        let msg = InitMsg {
+            marketplace_name: String::from("test market"),
+        };
+        let info = mock_info("creator", &coins(2, "token"));
+        let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
-            // beneficiary can release it
-            let info = mock_info("anyone", &coins(2, "token"));
+        // beneficiary can release it
+        let info = mock_info("anyone", &coins(2, "token"));
 
-             let sellMsg = SellNft {
-                 list_price: Cw20CoinHuman {
-                    address: HumanAddr::from("cw20ContractAddr"),
-                    amount: Uint128::from(5),
-                 }
-             };
+        let sellMsg = SellNft {
+            list_price: Cw20CoinHuman {
+                address: HumanAddr::from("cw20ContractAddr"),
+                amount: Uint128::from(5),
+            },
+        };
 
-            let msg = HandleMsg::Receive(Cw721Rcv(Cw721ReceiveMsg{
-                sender: HumanAddr::from("seller"),
-                token_id: String::from("SellableNFT"),
-                msg: to_binary(&sellMsg).ok(),
-            }));
-            let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
+        let msg = HandleMsg::Receive(Cw721Rcv(Cw721ReceiveMsg {
+            sender: HumanAddr::from("seller"),
+            token_id: String::from("SellableNFT"),
+            msg: to_binary(&sellMsg).ok(),
+        }));
+        let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
-            // Offering should be listed
-            let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-            let value: CountResponse = from_binary(&res).unwrap();
-            assert_eq!(18, value.count);
-        }
+        // Offering should be listed
+        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
+        let value: CountResponse = from_binary(&res).unwrap();
+        assert_eq!(18, value.count);
+    }
 
-//     #[test]
-//     fn reset() {
-//         let mut deps = mock_dependencies(&coins(2, "token"));
+    //     #[test]
+    //     fn reset() {
+    //         let mut deps = mock_dependencies(&coins(2, "token"));
 
-//         let msg = InitMsg { count: 17 };
-//         let info = mock_info("creator", &coins(2, "token"));
-//         let _res = init(&mut deps, mock_env(), info, msg).unwrap();
+    //         let msg = InitMsg { count: 17 };
+    //         let info = mock_info("creator", &coins(2, "token"));
+    //         let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
-//         // beneficiary can release it
-//         let unauth_info = mock_info("anyone", &coins(2, "token"));
-//         let msg = HandleMsg::Reset { count: 5 };
-//         let res = handle(&mut deps, mock_env(), unauth_info, msg);
-//         match res {
-//             Err(ContractError::Unauthorized {}) => {}
-//             _ => panic!("Must return unauthorized error"),
-//         }
+    //         // beneficiary can release it
+    //         let unauth_info = mock_info("anyone", &coins(2, "token"));
+    //         let msg = HandleMsg::Reset { count: 5 };
+    //         let res = handle(&mut deps, mock_env(), unauth_info, msg);
+    //         match res {
+    //             Err(ContractError::Unauthorized {}) => {}
+    //             _ => panic!("Must return unauthorized error"),
+    //         }
 
-//         // only the original creator can reset the counter
-//         let auth_info = mock_info("creator", &coins(2, "token"));
-//         let msg = HandleMsg::Reset { count: 5 };
-//         let _res = handle(&mut deps, mock_env(), auth_info, msg).unwrap();
+    //         // only the original creator can reset the counter
+    //         let auth_info = mock_info("creator", &coins(2, "token"));
+    //         let msg = HandleMsg::Reset { count: 5 };
+    //         let _res = handle(&mut deps, mock_env(), auth_info, msg).unwrap();
 
-//         // should now be 5
-//         let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-//         let value: CountResponse = from_binary(&res).unwrap();
-//         assert_eq!(5, value.count);
-//     }
- }
+    //         // should now be 5
+    //         let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
+    //         let value: CountResponse = from_binary(&res).unwrap();
+    //         assert_eq!(5, value.count);
+    //     }
+}
