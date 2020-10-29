@@ -17,9 +17,9 @@ pub struct State {
 pub struct Offering {
     pub token_id: String,
 
-    pub contract_addr: HumanAddr,
+    pub contract_addr: CanonicalAddr,
 
-    pub seller: HumanAddr,
+    pub seller: CanonicalAddr,
 
     pub list_price: Cw20CoinHuman,
 }

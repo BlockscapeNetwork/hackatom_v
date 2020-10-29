@@ -1,17 +1,15 @@
-use crate::msg::BuyNft;
-use cw20::Cw20ReceiveMsg;
-use crate::msg::SellNft;
-use crate::msg::ReceiveMsgWrapper;
-use crate::state::{increment_offerings, offerings, Offering, State, OFFERINGS, OFFERINGS_COUNT};
+use crate::state::{increment_offerings, Offering, State, OFFERINGS, OFFERINGS_COUNT};
 use cosmwasm_std::{
     attr, from_binary, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse,
     MessageInfo, Order, Querier, StdResult, Storage,
 };
+use cw20::{Cw20CoinHuman, Cw20ReceiveMsg};
 use cw_storage_plus::Bound;
 
 use crate::error::ContractError;
-use crate::msg::{HandleMsg, InitMsg, OfferingsResponse, QueryMsg};
-use cw20::Cw20CoinHuman;
+use crate::msg::{
+    BuyNft, HandleMsg, InitMsg, OfferingsResponse, QueryMsg, ReceiveMsgWrapper, SellNft,
+};
 use cw721::Cw721ReceiveMsg;
 
 // Note, you can use StdResult in some functions where you do not
@@ -32,7 +30,6 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
 // And declare a custom Error variant for the ones where you will want to make use of it
 pub fn handle<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
-    env: Env,
     info: MessageInfo,
     msg: HandleMsg,
 ) -> Result<HandleResponse, ContractError> {
@@ -71,10 +68,10 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
 
     // save Offering
     let off = Offering {
-        contract_addr: info.sender,
+        contract_addr: deps.api.canonical_address(&info.sender)?,
         token_id: rcvMsg.token_id,
-        seller: rcvMsg.sender,
-        list_price: msg.list_price,
+        seller: deps.api.canonical_address(&rcvMsg.sender)?,
+        list_price: msg.list_price.clone(),
     };
 
     OFFERINGS.save(&mut deps.storage, &id, &off)?;
@@ -120,7 +117,7 @@ pub fn try_withdraw<S: Storage, A: Api, Q: Querier>(
 ) -> Result<HandleResponse, ContractError> {
     // check if token_id is currently sold by the requesting address
     let off = OFFERINGS.load(&deps.storage, &token_id)?;
-    if off.seller == info.sender {
+    if off.seller == deps.api.canonical_address(&info.sender)? {
         return Ok(HandleResponse {
             messages: Vec::new(),
             attributes: vec![

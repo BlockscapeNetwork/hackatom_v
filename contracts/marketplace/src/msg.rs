@@ -1,7 +1,6 @@
-use cw20::Cw20ReceiveMsg;
-use cosmwasm_std::WasmMsg;
 use crate::state::Offering;
-use cw20::Cw20CoinHuman;
+use cosmwasm_std::WasmMsg;
+use cw20::{Cw20CoinHuman, Cw20ReceiveMsg};
 use cw721::Cw721ReceiveMsg;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -28,13 +27,13 @@ pub enum ReceiveMsgWrapper {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct SellNft {
-    pub list_price: Cw20CoinHuman
+    pub list_price: Cw20CoinHuman,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct BuyNft {
-    pub token_id: String
+    pub token_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
