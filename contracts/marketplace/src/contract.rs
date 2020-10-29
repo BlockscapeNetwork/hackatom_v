@@ -1,4 +1,4 @@
-use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS, OFFERINGS_COUNT};
+use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
 use cosmwasm_std::{
     attr, from_binary, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse,
     MessageInfo, Querier, StdResult, Storage,
@@ -15,6 +15,8 @@ use crate::msg::{
 // make use of the custom errors
 pub fn init<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
+    _env: Env,
+    _info: MessageInfo,
     msg: InitMsg,
 ) -> StdResult<InitResponse> {
     let info = ContractInfoResponse {
@@ -28,6 +30,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
 // And declare a custom Error variant for the ones where you will want to make use of it
 pub fn handle<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
+    _env: Env,
     info: MessageInfo,
     msg: HandleMsg,
 ) -> Result<HandleResponse, ContractError> {
@@ -94,7 +97,7 @@ pub fn try_buy_nft<S: Storage, A: Api, Q: Querier>(
     _info: MessageInfo,
     rcv_msg: Cw20ReceiveMsg,
 ) -> Result<HandleResponse, ContractError> {
-    let msg: BuyNft = match rcv_msg.msg {
+    let _msg: BuyNft = match rcv_msg.msg {
         Some(bin) => Ok(from_binary(&bin)?),
         None => Err(ContractError::NoData {}),
     }?;
