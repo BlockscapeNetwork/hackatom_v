@@ -1,5 +1,5 @@
 [package]
-name = "cw-marketplace"
+name = "marketplace"
 version = "0.1.0"
 authors = ["blockscape <blockscape-dev@mwaysolutions.com>"]
 edition = "2018"

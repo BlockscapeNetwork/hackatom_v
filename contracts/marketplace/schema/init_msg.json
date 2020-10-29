@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "InitMsg",
+  "type": "object",
+  "required": [
+    "marketplace_name",
+    "minter",
+    "symbol"
+  ],
+  "properties": {
+    "marketplace_name": {
+      "type": "string"
+    },
+    "minter": {
+      "$ref": "#/definitions/HumanAddr"
+    },
+    "symbol": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "HumanAddr": {
+      "type": "string"
+    }
+  }
+}
