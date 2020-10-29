@@ -1,11 +1,11 @@
 use crate::package::ContractInfoResponse;
 use crate::state::{increment_offerings, Offering, CONTRACT_INFO, OFFERINGS};
 use cosmwasm_std::{
-    attr, from_binary, to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse,
-    MessageInfo, Querier, StdResult, Storage,
+    attr, from_binary, to_binary, Api, Binary, CosmosMsg, Env, Extern, HandleResponse,
+    InitResponse, MessageInfo, Querier, StdResult, Storage, WasmMsg,
 };
-use cw20::Cw20ReceiveMsg;
-use cw721::Cw721ReceiveMsg;
+use cw20::{Cw20HandleMsg, Cw20ReceiveMsg};
+use cw721::{Cw721HandleMsg, Cw721ReceiveMsg};
 
 use crate::error::ContractError;
 use crate::msg::{
@@ -93,22 +93,69 @@ pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
 }
 
 pub fn try_buy_nft<S: Storage, A: Api, Q: Querier>(
-    _deps: &mut Extern<S, A, Q>,
-    _info: MessageInfo,
+    deps: &mut Extern<S, A, Q>,
+    info: MessageInfo,
     rcv_msg: Cw20ReceiveMsg,
 ) -> Result<HandleResponse, ContractError> {
-    let _msg: BuyNft = match rcv_msg.msg {
+    let msg: BuyNft = match rcv_msg.msg {
         Some(bin) => Ok(from_binary(&bin)?),
         None => Err(ContractError::NoData {}),
     }?;
 
     // check if offering exists
-    // check for enough coins
-    // if everything is fine transfer cw20 to seller
-    // transfer nft to buyer
-    //delete offering
+    let off = OFFERINGS.load(&deps.storage, &msg.token_id)?;
 
-    Ok(HandleResponse::default())
+    // check for enough coins
+    if rcv_msg.amount < off.list_price.amount {
+        return Err(ContractError::InsufficientFunds {});
+    }
+
+    // create transfer cw20 msg
+    let transfer_cw20_msg = Cw20HandleMsg::Transfer {
+        recipient: deps.api.human_address(&off.seller)?,
+        amount: rcv_msg.amount,
+    };
+    let exec_cw20_transfer = WasmMsg::Execute {
+        contract_addr: info.sender.clone(),
+        msg: to_binary(&transfer_cw20_msg)?,
+        send: vec![],
+    };
+
+    // create transfer cw721 msg
+    let transfer_cw721_msg = Cw721HandleMsg::TransferNft {
+        recipient: rcv_msg.sender.clone(),
+        token_id: off.token_id.clone(),
+    };
+    let exec_cw721_transfer = WasmMsg::Execute {
+        contract_addr: deps.api.human_address(&off.contract_addr)?,
+        msg: to_binary(&transfer_cw721_msg)?,
+        send: vec![],
+    };
+
+    // if everything is fine transfer cw20 to seller
+    let cw20_transfer_cosmos_msg: CosmosMsg = exec_cw20_transfer.into();
+    // transfer nft to buyer
+    let cw721_transfer_cosmos_msg: CosmosMsg = exec_cw721_transfer.into();
+
+    let cosmos_msgs = vec![cw20_transfer_cosmos_msg, cw721_transfer_cosmos_msg];
+
+    //delete offering
+    OFFERINGS.remove(&mut deps.storage, &msg.token_id);
+
+    let price_string = format!("{} {}", rcv_msg.amount, info.sender);
+
+    Ok(HandleResponse {
+        messages: cosmos_msgs,
+        attributes: vec![
+            attr("action", "buy_nft"),
+            attr("buyer", rcv_msg.sender),
+            attr("seller", off.seller),
+            attr("paid_price", price_string),
+            attr("token_id", off.token_id),
+            attr("contract_addr", off.contract_addr),
+        ],
+        data: None,
+    })
 }
 
 pub fn try_withdraw<S: Storage, A: Api, Q: Querier>(
