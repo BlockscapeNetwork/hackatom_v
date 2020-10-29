@@ -68,6 +68,8 @@ Example output:
 wasmcli tx wasm instantiate 64 '{ "marketplace_name": "Test Marketplace" }' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
+Once instantiated, you can use `wasmcli query wasm list-contract-by-code <ID>` to query contract info.
+
 ### Execute Contract Method
 
 ```shell
