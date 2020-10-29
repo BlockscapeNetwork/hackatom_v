@@ -30,6 +30,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
 // And declare a custom Error variant for the ones where you will want to make use of it
 pub fn handle<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
+    _env: Env,
     info: MessageInfo,
     msg: HandleMsg,
 ) -> Result<HandleResponse, ContractError> {
@@ -163,11 +164,14 @@ fn query_offerings<S: Storage, A: Api, Q: Querier>(
 
 // ============================== Test ==============================
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-//     use cosmwasm_std::{coins, from_binary};
+#[cfg(test)]
+mod tests {
+    use cosmwasm_std::Uint128;
+use cosmwasm_std::HumanAddr;
+use crate::msg::ReceiveMsgWrapper::Cw721Rcv;
+use super::*;
+    use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
+    use cosmwasm_std::{coins, from_binary};
 
 //     #[test]
 //     fn proper_initialization() {
@@ -186,24 +190,38 @@ fn query_offerings<S: Storage, A: Api, Q: Querier>(
 //         assert_eq!(17, value.count);
 //     }
 
-//     #[test]
-//     fn increment() {
-//         let mut deps = mock_dependencies(&coins(2, "token"));
+        #[test]
+        fn post_offering() {
+            let mut deps = mock_dependencies(&coins(2, "token"));
 
-//         let msg = InitMsg { count: 17 };
-//         let info = mock_info("creator", &coins(2, "token"));
-//         let _res = init(&mut deps, mock_env(), info, msg).unwrap();
+            let msg = InitMsg { 
+                marketplace_name: String::from("test market"),
+             };
+            let info = mock_info("creator", &coins(2, "token"));
+            let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
-//         // beneficiary can release it
-//         let info = mock_info("anyone", &coins(2, "token"));
-//         let msg = HandleMsg::Increment {};
-//         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
+            // beneficiary can release it
+            let info = mock_info("anyone", &coins(2, "token"));
 
-//         // should increase counter by 1
-//         let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-//         let value: CountResponse = from_binary(&res).unwrap();
-//         assert_eq!(18, value.count);
-//     }
+             let sellMsg = SellNft {
+                 list_price: Cw20CoinHuman {
+                    address: HumanAddr::from("cw20ContractAddr"),
+                    amount: Uint128::from(5),
+                 }
+             };
+
+            let msg = HandleMsg::Receive(Cw721Rcv(Cw721ReceiveMsg{
+                sender: HumanAddr::from("seller"),
+                token_id: String::from("SellableNFT"),
+                msg: to_binary(&sellMsg).ok(),
+            }));
+            let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
+
+            // Offering should be listed
+            let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
+            let value: CountResponse = from_binary(&res).unwrap();
+            assert_eq!(18, value.count);
+        }
 
 //     #[test]
 //     fn reset() {
@@ -232,4 +250,4 @@ fn query_offerings<S: Storage, A: Api, Q: Querier>(
 //         let value: CountResponse = from_binary(&res).unwrap();
 //         assert_eq!(5, value.count);
 //     }
-// }
+ }
