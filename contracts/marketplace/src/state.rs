@@ -1,4 +1,4 @@
-use cw721::ContractInfoResponse;
+use crate::package::ContractInfoResponse;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
