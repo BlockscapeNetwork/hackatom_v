@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OfferingsResponse",
+  "type": "object",
+  "required": [
+    "offerings"
+  ],
+  "properties": {
+    "offerings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Offering"
+      }
+    }
+  },
+  "definitions": {
+    "Binary": {
+      "description": "Binary is a wrapper around Vec<u8> to add base64 de/serialization with serde. It also adds some helper methods to help encode inline.\n\nThis is only needed as serde-json-{core,wasm} has a horrible encoding for Vec<u8>",
+      "type": "string"
+    },
+    "CanonicalAddr": {
+      "$ref": "#/definitions/Binary"
+    },
+    "Cw20CoinHuman": {
+      "type": "object",
+      "required": [
+        "address",
+        "amount"
+      ],
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/HumanAddr"
+        },
+        "amount": {
+          "$ref": "#/definitions/Uint128"
+        }
+      }
+    },
+    "HumanAddr": {
+      "type": "string"
+    },
+    "Offering": {
+      "type": "object",
+      "required": [
+        "contract_addr",
+        "list_price",
+        "seller",
+        "token_id"
+      ],
+      "properties": {
+        "contract_addr": {
+          "$ref": "#/definitions/CanonicalAddr"
+        },
+        "list_price": {
+          "$ref": "#/definitions/Cw20CoinHuman"
+        },
+        "seller": {
+          "$ref": "#/definitions/CanonicalAddr"
+        },
+        "token_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Uint128": {
+      "type": "string"
+    }
+  }
+}
