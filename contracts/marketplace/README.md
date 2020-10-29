@@ -76,6 +76,8 @@ wasmcli tx wasm execute <CONTRACT_ADDR> '{<json encoded method params>}' --gas-p
 
 #### Selling an NFT Token
 
+> :information_source: Needs `cw721-base` and `marketplace` deployed on the blockchain.
+
 Puts an NFT token up for sale.
 
 ```shell
@@ -88,6 +90,8 @@ wasmcli tx wasm execute <CW721_CONTRACT_ADDR> '{ "send_nft": { "contract": "<MAR
 
 #### Withdrawing an NFT Token Offering
 
+> :information_source: Needs `cw721-base` and `marketplace` deployed on the blockchain.
+
 Withdraws an NFT token offering from the global offerings list.
 
 :warning: Only works after having used `SellNft` on a token.
@@ -98,6 +102,8 @@ wasmcli tx wasm execute <MARKETPLACE_CONTRACT_ADDR> '{ "withdraw_nft": { "token_
 ```
 
 #### Buying an NFT Token
+
+> :information_source: Needs `cw20-base`, `cw721-base` and `marketplace` deployed on the blockchain.
 
 Buys an NFT token, transferring funds to the seller and the token to the buyer.
 
