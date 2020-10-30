@@ -56,7 +56,7 @@ dependencies = [
  "cw-storage-plus 0.3.2",
  "cw0 0.3.2",
  "cw2 0.3.2",
- "cw721 0.3.2",
+ "cw721 0.3.1",
  "cw721-base",
  "schemars",
  "serde",
