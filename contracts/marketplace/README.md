@@ -103,7 +103,7 @@ wasmcli tx wasm instantiate <CW721-BASE_CONTRACT_ID> '{
 
 # marketplace initialization
 wasmcli tx wasm instantiate <MARKETPLACE_CONTRACT_ID> '{
-  "marketplace_name": "<INSERT_NAME>"
+  "name": "<INSERT_NAME>"
 }' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
