@@ -28,12 +28,12 @@ wasmcli config trust-node true
 3) You will need two accounts and get some tokens from the faucet. **If you already have accounts with funds, you can skip this step.**
 
 ```shell
-# Create accounts
+# Create accounts and save the mnemonics
 wasmcli keys add client
 wasmcli keys add partner
 ```
 
-Save the mnemonics and get funds from the [faucet](https://five.hackatom.org/resources).
+Next, get funds from the [faucet](https://five.hackatom.org/resources). Otherwise, you won't be able to deploy the smart contracts on the blockchain.
 
 ### Building the Contracts
 
