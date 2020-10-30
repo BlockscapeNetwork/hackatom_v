@@ -3,7 +3,7 @@ use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
 
-use marketplace::msg::{BuyNft, HandleMsg, InitMsg, QueryMsg, ReceiveMsgWrapper, SellNft};
+use marketplace::msg::{BuyNft, HandleMsg, InitMsg, QueryMsg, SellNft};
 use marketplace::package::{ContractInfoResponse, OfferingsResponse, QueryOfferingsResult};
 
 fn main() {
@@ -14,7 +14,6 @@ fn main() {
 
     export_schema(&schema_for!(InitMsg), &out_dir);
     export_schema(&schema_for!(HandleMsg), &out_dir);
-    export_schema(&schema_for!(ReceiveMsgWrapper), &out_dir);
     export_schema(&schema_for!(QueryMsg), &out_dir);
     export_schema(&schema_for!(SellNft), &out_dir);
     export_schema(&schema_for!(BuyNft), &out_dir);
