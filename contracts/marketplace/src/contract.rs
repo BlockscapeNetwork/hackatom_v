@@ -10,7 +10,7 @@ use cw721::{Cw721HandleMsg, Cw721ReceiveMsg};
 use std::str::from_utf8;
 
 use crate::error::ContractError;
-use crate::msg::{BuyNft, HandleMsg, InitMsg, QueryMsg, ReceiveMsgWrapper, SellNft};
+use crate::msg::{BuyNft, HandleMsg, InitMsg, QueryMsg, SellNft};
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -35,62 +35,13 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     match msg {
         HandleMsg::WithdrawNft { offering_id } => try_withdraw(deps, info, offering_id),
         HandleMsg::Receive(msg) => try_receive(deps, info, msg),
+        HandleMsg::ReceiveNft(msg) => try_receive_nft(deps, info, msg),
     }
 }
 
 // ============================== Message Handlers ==============================
 
 pub fn try_receive<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    info: MessageInfo,
-    wrapper: ReceiveMsgWrapper,
-) -> Result<HandleResponse, ContractError> {
-    match wrapper {
-        ReceiveMsgWrapper::Cw20Rcv(msg) => try_buy_nft(deps, info, msg),
-        ReceiveMsgWrapper::Cw721Rcv(msg) => try_sell_nft(deps, info, msg),
-    }
-}
-
-pub fn try_sell_nft<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-    info: MessageInfo,
-    rcv_msg: Cw721ReceiveMsg,
-) -> Result<HandleResponse, ContractError> {
-    let msg: SellNft = match rcv_msg.msg {
-        Some(bin) => Ok(from_binary(&bin)?),
-        None => Err(ContractError::NoData {}),
-    }?;
-
-    // check if same token Id form same original contract is already on sale
-    // get OFFERING_COUNT
-    let id = increment_offerings(&mut deps.storage)?.to_string();
-
-    // save Offering
-    let off = Offering {
-        contract_addr: deps.api.canonical_address(&info.sender)?,
-        token_id: rcv_msg.token_id,
-        seller: deps.api.canonical_address(&rcv_msg.sender)?,
-        list_price: msg.list_price.clone(),
-    };
-
-    OFFERINGS.save(&mut deps.storage, &id, &off)?;
-
-    let price_string = format!("{} {}", msg.list_price.amount, msg.list_price.address);
-
-    Ok(HandleResponse {
-        messages: Vec::new(),
-        attributes: vec![
-            attr("action", "sell_nft"),
-            attr("original_contract", info.sender),
-            attr("seller", off.seller),
-            attr("list_price", price_string),
-            attr("token_id", off.token_id),
-        ],
-        data: None,
-    })
-}
-
-pub fn try_buy_nft<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
     rcv_msg: Cw20ReceiveMsg,
@@ -151,6 +102,45 @@ pub fn try_buy_nft<S: Storage, A: Api, Q: Querier>(
             attr("paid_price", price_string),
             attr("token_id", off.token_id),
             attr("contract_addr", off.contract_addr),
+        ],
+        data: None,
+    })
+}
+
+pub fn try_receive_nft<S: Storage, A: Api, Q: Querier>(
+    deps: &mut Extern<S, A, Q>,
+    info: MessageInfo,
+    rcv_msg: Cw721ReceiveMsg,
+) -> Result<HandleResponse, ContractError> {
+    let msg: SellNft = match rcv_msg.msg {
+        Some(bin) => Ok(from_binary(&bin)?),
+        None => Err(ContractError::NoData {}),
+    }?;
+
+    // check if same token Id form same original contract is already on sale
+    // get OFFERING_COUNT
+    let id = increment_offerings(&mut deps.storage)?.to_string();
+
+    // save Offering
+    let off = Offering {
+        contract_addr: deps.api.canonical_address(&info.sender)?,
+        token_id: rcv_msg.token_id,
+        seller: deps.api.canonical_address(&rcv_msg.sender)?,
+        list_price: msg.list_price.clone(),
+    };
+
+    OFFERINGS.save(&mut deps.storage, &id, &off)?;
+
+    let price_string = format!("{} {}", msg.list_price.amount, msg.list_price.address);
+
+    Ok(HandleResponse {
+        messages: Vec::new(),
+        attributes: vec![
+            attr("action", "sell_nft"),
+            attr("original_contract", info.sender),
+            attr("seller", off.seller),
+            attr("list_price", price_string),
+            attr("token_id", off.token_id),
         ],
         data: None,
     })
@@ -240,8 +230,6 @@ fn parse_offering<A: Api>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::msg::ReceiveMsgWrapper::Cw20Rcv;
-    use crate::msg::ReceiveMsgWrapper::Cw721Rcv;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{coins, from_binary, HumanAddr, Uint128};
     use cw20::Cw20CoinHuman;
@@ -283,11 +271,11 @@ mod tests {
             },
         };
 
-        let msg = HandleMsg::Receive(Cw721Rcv(Cw721ReceiveMsg {
+        let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
             sender: HumanAddr::from("seller"),
             token_id: String::from("SellableNFT"),
             msg: to_binary(&sell_msg).ok(),
-        }));
+        });
         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
         // Offering should be listed
@@ -299,11 +287,11 @@ mod tests {
             offering_id: value.offerings[0].id.clone(),
         };
 
-        let msg2 = HandleMsg::Receive(Cw20Rcv(Cw20ReceiveMsg {
+        let msg2 = HandleMsg::Receive(Cw20ReceiveMsg {
             sender: HumanAddr::from("buyer"),
             amount: Uint128(5),
             msg: to_binary(&buy_msg).ok(),
-        }));
+        });
 
         let info_buy = mock_info("cw20ContractAddr", &coins(2, "token"));
 
@@ -335,11 +323,11 @@ mod tests {
             },
         };
 
-        let msg = HandleMsg::Receive(Cw721Rcv(Cw721ReceiveMsg {
+        let msg = HandleMsg::ReceiveNft(Cw721ReceiveMsg {
             sender: HumanAddr::from("seller"),
             token_id: String::from("SellableNFT"),
             msg: to_binary(&sell_msg).ok(),
-        }));
+        });
         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
         // Offering should be listed

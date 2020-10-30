@@ -12,14 +12,8 @@ pub struct InitMsg {
 #[serde(rename_all = "snake_case")]
 pub enum HandleMsg {
     WithdrawNft { offering_id: String },
-    Receive(ReceiveMsgWrapper),
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum ReceiveMsgWrapper {
-    Cw20Rcv(Cw20ReceiveMsg),
-    Cw721Rcv(Cw721ReceiveMsg),
+    Receive(Cw20ReceiveMsg),
+    ReceiveNft(Cw721ReceiveMsg),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

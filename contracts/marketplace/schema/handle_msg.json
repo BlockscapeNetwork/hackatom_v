@@ -28,7 +28,18 @@
       ],
       "properties": {
         "receive": {
-          "$ref": "#/definitions/ReceiveMsgWrapper"
+          "$ref": "#/definitions/Cw20ReceiveMsg"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "receive_nft"
+      ],
+      "properties": {
+        "receive_nft": {
+          "$ref": "#/definitions/Cw721ReceiveMsg"
         }
       }
     }
@@ -92,32 +103,6 @@
     },
     "HumanAddr": {
       "type": "string"
-    },
-    "ReceiveMsgWrapper": {
-      "anyOf": [
-        {
-          "type": "object",
-          "required": [
-            "cw20_rcv"
-          ],
-          "properties": {
-            "cw20_rcv": {
-              "$ref": "#/definitions/Cw20ReceiveMsg"
-            }
-          }
-        },
-        {
-          "type": "object",
-          "required": [
-            "cw721_rcv"
-          ],
-          "properties": {
-            "cw721_rcv": {
-              "$ref": "#/definitions/Cw721ReceiveMsg"
-            }
-          }
-        }
-      ]
     },
     "Uint128": {
       "type": "string"
