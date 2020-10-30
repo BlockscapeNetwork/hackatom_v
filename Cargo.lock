@@ -57,7 +57,6 @@ dependencies = [
  "cw0",
  "cw2",
  "cw721",
- "cw721-base",
  "schemars",
  "serde",
  "thiserror",
@@ -100,7 +99,7 @@ dependencies = [
 
 [[package]]
 name = "cw-storage-plus"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-std",
  "schemars",
@@ -109,7 +108,7 @@ dependencies = [
 
 [[package]]
 name = "cw0"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-std",
  "schemars",
@@ -118,7 +117,7 @@ dependencies = [
 
 [[package]]
 name = "cw1"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -128,7 +127,7 @@ dependencies = [
 
 [[package]]
 name = "cw2"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-std",
  "cw-storage-plus",
@@ -138,7 +137,7 @@ dependencies = [
 
 [[package]]
 name = "cw20"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -149,7 +148,7 @@ dependencies = [
 
 [[package]]
 name = "cw3"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -170,7 +169,7 @@ dependencies = [
 
 [[package]]
 name = "cw721"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -181,7 +180,7 @@ dependencies = [
 
 [[package]]
 name = "cw721-base"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
