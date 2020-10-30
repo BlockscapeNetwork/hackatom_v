@@ -40,7 +40,7 @@ wasmcli keys add myacc
 |:----------------|:----------------------------------------------|
 | marketplace     | cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 |
 | cw20-base       | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
-| cosmons (cw721) | cosmos15wwqx340fed8z9etgwerryvd8z9kqca5kk60zw |
+| cosmons (cw721) | cosmos1zhh3m9sg5e2qvjgwr49r79pf5pt65yuxvs7cs0 |
 
 ## Messages
 
