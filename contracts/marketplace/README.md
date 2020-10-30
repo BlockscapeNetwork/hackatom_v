@@ -66,8 +66,8 @@ Now that we've built our contracts, we need to upload them to the blockchain.
 
 ```shell
 # Upload both cw20-base and cw721-base from cosmwasm-plus/artifacts/ directory
-wasmcli tx wasm store cw20-base.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
-wasmcli tx wasm store cw721-base.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
+wasmcli tx wasm store cw20_base.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
+wasmcli tx wasm store cw721_base.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
 
 # Upload marketplace from hackatom_v/artifacts/ directory
 wasmcli tx wasm store marketplace.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
@@ -79,10 +79,10 @@ Now that we've uploaded our contracts to the blockchain, we need to instantiate 
 
 ```shell
 # cw20-base initialization
-wasmcli tx wasm instantiate <CW20-BASE_CONTRACT_ID> '{
+wasmcli tx wasm instantiate <CW20_BASE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>",
   "symbol": "<INSERT_SYMBOL>",
-  "decimals": "<INSERT_DECIMALS>",
+  "decimals": <INSERT_DECIMALS>,
   "initial_balances": [
     {
       "address": "<INSERT_ADDR>",
@@ -95,7 +95,7 @@ wasmcli tx wasm instantiate <CW20-BASE_CONTRACT_ID> '{
 }' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 
 # cw721-base initialization
-wasmcli tx wasm instantiate <CW721-BASE_CONTRACT_ID> '{
+wasmcli tx wasm instantiate <CW721_BASE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>",
   "symbol": "<INSERT_SYMBOL>",
   "minter": "<INSERT_MINTER_ADDR>"
@@ -112,7 +112,11 @@ Once instantiated, you can use `wasmcli query wasm list-contract-by-code <CONTRA
 ### Executing a Contract Method
 
 ```shell
-wasmcli tx wasm execute <CONTRACT_ADDR> '{ "method_name": { <json encoded method params> } }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
+wasmcli tx wasm execute <CONTRACT_ADDR> '{
+  "method_name": {
+    <json encoded method params>
+  }
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
 #### Selling an NFT Token
@@ -121,10 +125,17 @@ Puts an NFT token up for sale.
 
 ```shell
 # Mint NFT token
-wasmcli tx wasm execute <CW721-BASE_CONTRACT_ADDR> '{ "mint": { "token_id": "<TOKEN_ID>", "owner": "OWNER_ADDR", "name": "TOKEN_NAME", "level": "TOKEN_LEVEL" } }'
+wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
+  "mint": {
+    "token_id": "<TOKEN_ID>",
+    "owner": "OWNER_ADDR",
+    "name": "TOKEN_NAME",
+    "level": "TOKEN_LEVEL"
+  }
+}'
 
 # Execute send_nft action to put token up for sale for specified list_price on the marketplace
-wasmcli tx wasm execute <CW721-BASE_CONTRACT_ADDR> '{
+wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
   "send_nft": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "token_id": "<TOKEN_ID>",
@@ -152,7 +163,7 @@ wasmcli tx wasm execute <CW721-BASE_CONTRACT_ADDR> '{
 
 Withdraws an NFT token offering from the global offerings list and returns the NFT token back to its owner.
 
-> :warning: This will only work after having used `SellNft` on a token.
+> :warning: This will only work after having used `sell_nft` on a token.
 
 ```shell
 # Execute withdraw_nft action to withdraw the token with the specified offering_id from the marketplace
@@ -167,11 +178,11 @@ wasmcli tx wasm execute <MARKETPLACE_CONTRACT_ADDR> '{
 
 Buys an NFT token, transferring funds to the seller and the token to the buyer.
 
-> :warning: This will only work after having used `SellNft` on a token.
+> :warning: This will only work after having used `sell_nft` on a token.
 
 ```shell
 # Execute send action to buy token with the specified offering_id from the marketplace
-wasmcli tx wasm execute <CW20-BASE_CONTRACT_ADDR> '{
+wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
   "send": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "amount": "<INSERT_AMOUNT>",
