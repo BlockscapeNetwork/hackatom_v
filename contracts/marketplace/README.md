@@ -25,13 +25,22 @@ wasmcli config output json
 wasmcli config trust-node true
 ```
 
+3) Create an account with some tokens from the [faucet](https://five.hackatom.org/resources).
+
+> :information_source: **If you already have an account with funds, you can skip this step.**
+
+```shell
+# Create account and save mnemonics
+wasmcli keys add myacc
+```
+
 ## Contract Addresses
 
-| Contract    | Address                                       |
-|:------------|:----------------------------------------------|
-| marketplace | cosmos1hjh34wfmuplcs5f69f8skfskhum7ekcd0qwh9a |
-| cw20-base   | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
-| cosmons     | - |
+| Contract        | Address                                       |
+|:----------------|:----------------------------------------------|
+| marketplace     | cosmos1hjh34wfmuplcs5f69f8skfskhum7ekcd0qwh9a |
+| cw20-base       | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
+| cosmons (cw721) | - |
 
 ## Messages
 
