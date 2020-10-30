@@ -248,7 +248,7 @@ mod tests {
     //     }
 
     #[test]
-    fn post_offering() {
+    fn post_offering_happy_path() {
         let mut deps = mock_dependencies(&coins(2, "token"));
 
         let msg = InitMsg {
@@ -275,9 +275,9 @@ mod tests {
         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
         // Offering should be listed
-        // let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-        // let value: CountResponse = from_binary(&res).unwrap();
-        // assert_eq!(18, value.count);
+        let res = query(&deps, mock_env(), QueryMsg::GetOfferings {}).unwrap();
+        let value: OfferingsResponse = from_binary(&res).unwrap();
+        assert_eq!(1, value.offerings.len());
     }
 
     //     #[test]
