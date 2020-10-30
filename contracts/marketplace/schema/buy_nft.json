@@ -3,10 +3,10 @@
   "title": "BuyNft",
   "type": "object",
   "required": [
-    "token_id"
+    "offering_id"
   ],
   "properties": {
-    "token_id": {
+    "offering_id": {
       "type": "string"
     }
   }

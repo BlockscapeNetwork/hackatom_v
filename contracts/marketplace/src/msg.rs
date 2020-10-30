@@ -11,7 +11,7 @@ pub struct InitMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum HandleMsg {
-    WithdrawNft { token_id: String },
+    WithdrawNft { offering_id: String },
     Receive(ReceiveMsgWrapper),
 }
 
@@ -31,7 +31,7 @@ pub struct SellNft {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub struct BuyNft {
-    pub token_id: String,
+    pub offering_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
