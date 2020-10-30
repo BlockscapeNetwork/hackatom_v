@@ -124,3 +124,20 @@ mine.allTokens("", 10)
 ### Errata
 
 Faucet is not supported.
+
+## Licenses
+
+This repo contains two license, [Apache 2.0](./LICENSE-APACHE) and
+[AGPL 3.0](./LICENSE-AGPL.md). All crates in this repo may be licensed
+as one or the other. Please check the `NOTICE` in each crate or the 
+relevant `Cargo.toml` file for clarity.
+
+All *specifications* will always be Apache-2.0. All contracts that are
+meant to be *building blocks* will also be Apache-2.0. This is along
+the lines of Open Zepellin or other public references.
+
+Contracts that are "ready to deploy" may be licensed under AGPL 3.0 to 
+encourage anyone using them to contribute back any improvements they
+make. This is common practice for actual projects running on Ethereum,
+like Uniswap or Maker DAO.
+
