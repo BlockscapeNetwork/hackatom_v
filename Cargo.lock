@@ -159,6 +159,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cw4"
+version = "0.3.2"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "cw721"
 version = "0.3.1"
 dependencies = [
