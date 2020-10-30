@@ -34,9 +34,9 @@ pub enum HandleMsg {
         token_id: String,
         msg: Option<Binary>,
     },
-    BattleMonster{
+    BattleMonster {
         attacker_id: String,
-        defender_id: String
+        defender_id: String,
     },
     /// Allows operator to transfer / send the token from the owner's account.
     /// If expiration is set, then this allowance has a time/height limit
@@ -72,7 +72,7 @@ pub struct MintMsg {
     /// Identifies the asset to which this NFT represents
     pub name: String,
     // Monster level
-    pub level: u64, 
+    pub level: u64,
     /// Describes the asset to which this NFT represents (may be empty)
     pub description: Option<String>,
     /// A URI pointing to an image representing the asset
