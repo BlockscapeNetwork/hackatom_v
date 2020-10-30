@@ -1,6 +1,6 @@
 # Marketplace Smart Contract
 
-The marketplace smart contracts provides a platform for selling CW721 tokens and buying them in exchange for CW20 tokens. The marketplace maintains a list of all current offerings, including the seller's address, the token ID put up for sale, the list price of the token in CW20 tokens and the contract address the offerings originated from. This ensures maximum visibility on a per-offering bases instead of a per-contract basis.
+The marketplace smart contracts provides a platform for selling and buying CW721 tokens with CW20 tokens. The marketplace maintains a list of all current offerings, including the seller's address, the token ID put up for sale, the list price of the token and the contract address the offerings originated from. This ensures maximum visibility on a per-sale basis instead of a per-contract basis.
 
 ## Requirements
 
@@ -132,7 +132,7 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
     "name": "<TOKEN_NAME>",
     "level": <TOKEN_LEVEL>
   }
-}'
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 
 # Execute send_nft action to put token up for sale for specified list_price on the marketplace
 wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
@@ -156,7 +156,7 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
       }
     }
   }
-}'
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
 #### Withdrawing an NFT Token Offering
@@ -171,7 +171,7 @@ wasmcli tx wasm execute <MARKETPLACE_CONTRACT_ADDR> '{
   "withdraw_nft": {
     "offering_id": "<INSERT_OFFERING_ID>"
   }
-}'
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
 #### Buying an NFT Token
@@ -200,7 +200,7 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
       }
     }
   }
-}'
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
 #### Querying List of Offerings
@@ -210,5 +210,5 @@ Retrieves a list of all currently listed offerings.
 ```shell
 wasmcli query wasm contract_state smart <MARKETPLACE_CONTRACT_ADDR> '{
   "get_offerings": {}
-}'
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
