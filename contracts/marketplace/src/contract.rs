@@ -166,8 +166,21 @@ pub fn try_withdraw<S: Storage, A: Api, Q: Querier>(
     // check if token_id is currently sold by the requesting address
     let off = OFFERINGS.load(&deps.storage, &token_id)?;
     if off.seller == deps.api.canonical_address(&info.sender)? {
+        let transfer_cw721_msg = Cw721HandleMsg::TransferNft {
+            recipient: deps.api.human_address(&off.seller)?,
+            token_id: off.token_id.clone(),
+        };
+
+        let exec_cw721_transfer = WasmMsg::Execute {
+            contract_addr: deps.api.human_address(&off.contract_addr)?,
+            msg: to_binary(&transfer_cw721_msg)?,
+            send: vec![],
+        };
+
+        let cw721_transfer_cosmos_msg: Vec<CosmosMsg> = vec![exec_cw721_transfer.into()];
+
         return Ok(HandleResponse {
-            messages: Vec::new(),
+            messages: cw721_transfer_cosmos_msg,
             attributes: vec![
                 attr("action", "withdraw_nft"),
                 attr("seller", info.sender),
