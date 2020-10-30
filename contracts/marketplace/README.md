@@ -1,6 +1,6 @@
 # Marketplace Smart Contract
 
-This smart contract enables selling cw721 NFT tokens. To accomplish this the contract implements a *receiveNft* function which acts as a counterpart to the cw721 *sendNft* function. It also provides further functions for trading.
+This smart contract provides a marketplace for selling and buying cw721 NFT tokens.
 
 ## Messages
 
@@ -15,7 +15,7 @@ This smart contract enables selling cw721 NFT tokens. To accomplish this the con
 
 | Query            | Description                                                                                                               | Status             |
 |:-----------------|:--------------------------------------------------------------------------------------------------------------------------|:------------------:|
-| `getOfferings()` | Retrieves a list of all current offerings (seller address, token information, contract address the token originated from) | :x:                |
+| `getOfferings()` | Retrieves a list of all current offerings (seller address, token information, contract address the token originated from) | :white_check_mark: |
 
 ## CLI Workflow
 
