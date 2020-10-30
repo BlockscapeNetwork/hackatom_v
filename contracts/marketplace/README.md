@@ -25,13 +25,23 @@ wasmcli config output json
 wasmcli config trust-node true
 ```
 
-3) Create an account with some tokens from the [faucet](https://five.hackatom.org/resources).
+3) Create an account with some tokens from the [faucet](https://five.hackatom.org/resources). Otherwise, you won't be able to make any transactions.
 
 > :information_source: **If you already have an account with funds, you can skip this step.**
 
 ```shell
 # Create account and save mnemonics
 wasmcli keys add myacc
+```
+
+4) Before you can buy or sell CW721 tokens, you will need some CW20 tokens. You can get them from our faucet: `POST 3.121.232.142:8080/faucet`
+
+Example payload:
+
+```json
+{
+  "address": "<INSERT_ADDRESS>"
+}
 ```
 
 ## Contract Addresses
