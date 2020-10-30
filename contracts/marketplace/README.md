@@ -38,9 +38,9 @@ wasmcli keys add myacc
 
 | Contract        | Address                                       |
 |:----------------|:----------------------------------------------|
-| marketplace     | cosmos1hjh34wfmuplcs5f69f8skfskhum7ekcd0qwh9a |
+| marketplace     | cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 |
 | cw20-base       | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
-| cosmons (cw721) | - |
+| cosmons (cw721) | cosmos15wwqx340fed8z9etgwerryvd8z9kqca5kk60zw |
 
 ## Messages
 
@@ -88,9 +88,7 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
   "send": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "amount": "<INSERT_AMOUNT>",
-    "msg": {
-      "<BASE64_ENCODED_JSON({ "offering_id": "<INSERT_OFFERING_ID>" })"
-    }
+    "msg": "<BASE64_ENCODED_JSON({ "offering_id": "<INSERT_OFFERING_ID>" })"
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
