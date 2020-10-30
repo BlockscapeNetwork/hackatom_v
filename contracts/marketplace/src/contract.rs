@@ -20,9 +20,7 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     _info: MessageInfo,
     msg: InitMsg,
 ) -> StdResult<InitResponse> {
-    let info = ContractInfoResponse {
-        marketplace_name: msg.marketplace_name,
-    };
+    let info = ContractInfoResponse { name: msg.name };
     CONTRACT_INFO.save(&mut deps.storage, &info)?;
     Ok(InitResponse::default())
 }
@@ -258,7 +256,7 @@ mod tests {
         let mut deps = mock_dependencies(&coins(2, "token"));
 
         let msg = InitMsg {
-            marketplace_name: String::from("test market"),
+            name: String::from("test market"),
         };
         let info = mock_info("creator", &coins(2, "token"));
         let _res = init(&mut deps, mock_env(), info, msg).unwrap();
@@ -310,7 +308,7 @@ mod tests {
         let mut deps = mock_dependencies(&coins(2, "token"));
 
         let msg = InitMsg {
-            marketplace_name: String::from("test market"),
+            name: String::from("test market"),
         };
         let info = mock_info("creator", &coins(2, "token"));
         let _res = init(&mut deps, mock_env(), info, msg).unwrap();

@@ -3,10 +3,10 @@
   "title": "ContractInfoResponse",
   "type": "object",
   "required": [
-    "marketplace_name"
+    "name"
   ],
   "properties": {
-    "marketplace_name": {
+    "name": {
       "type": "string"
     }
   }
