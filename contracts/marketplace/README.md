@@ -56,12 +56,7 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
   "send_nft": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "token_id": "<TOKEN_ID>",
-    "msg": {
-      "list_price": {
-        "address": "<INSERT_ADDR>",
-        "amount": "<INSERT_AMOUNT>"
-      }
-    }
+    "msg": "<BASE64_ENCODED_JSON({ "list_price": { "address": "<INSERT_ADDR>", "amount": "<INSERT_AMOUNT>" })>"
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
@@ -94,7 +89,7 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "amount": "<INSERT_AMOUNT>",
     "msg": {
-      "offering_id": "<INSERT_OFFERING_ID>"
+      "<BASE64_ENCODED_JSON({ "offering_id": "<INSERT_OFFERING_ID>" })"
     }
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
