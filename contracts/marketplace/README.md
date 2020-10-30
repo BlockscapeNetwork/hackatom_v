@@ -1,6 +1,6 @@
 # Marketplace Smart Contract
 
-The marketplace smart contracts provides a platform for selling and buying CW721 tokens with CW20 tokens. The marketplace maintains a list of all current offerings, including the seller's address, the token ID put up for sale, the list price of the token and the contract address the offerings originated from. This ensures maximum visibility on a per-sale basis instead of a per-contract basis.
+The marketplace smart contracts provides a generic platform used for selling and buying CW721 tokens with CW20 tokens. It maintains a list of all current offerings, including the seller's address, the token ID put up for sale, the list price of the token and the contract address the offerings originated from. This ensures maximum visibility on a per-sale instead of a per-contract basis, allowing users to browse through list of offerings in one central place.
 
 ## Requirements
 
