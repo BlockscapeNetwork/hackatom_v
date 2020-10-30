@@ -25,115 +25,23 @@ wasmcli config output json
 wasmcli config trust-node true
 ```
 
-3) You will need two accounts and get some tokens from the faucet. **If you already have accounts with funds, you can skip this step.**
+## Contract Addresses
 
-```shell
-# Create accounts and save the mnemonics
-wasmcli keys add client
-wasmcli keys add partner
-```
+| Contract    | Address                                       |
+|:------------|:----------------------------------------------|
+| marketplace | cosmos1hjh34wfmuplcs5f69f8skfskhum7ekcd0qwh9a |
+| cw20-base   | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
+| cosmons     | - |
 
-Next, get funds from the [faucet](https://five.hackatom.org/resources). Otherwise, you won't be able to deploy the smart contracts on the blockchain.
+## Messages
 
-### Building the Contracts
-
-We need to build three smart contracts in total:
-
-* `cw20-base` for buying tokens,
-* `cw721-base` for selling tokens and withdrawing offerings
-* and `marketplace`.
-
-```shell
-# Cargo build
-# - cw20-base from cosmwasm-plus/contracts/cw20-base
-# - cw721-base from from cosmwasm-plus/contracts/cw721-base
-cargo wasm
-
-# Docker build from
-# - cosmwasm-plus/ directory for cw20-base and cw721-base
-# - hackatom_v/ directory for marketplace
-docker run --rm -v "$(pwd)":/code \
-  --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
-  --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
-  cosmwasm/workspace-optimizer:0.10.4
-```
-
-### Uploading the Contracts
-
-Now that we've built our contracts, we need to upload them to the blockchain.
-
-> :information_source: In order to avoid confusion, run `wasmcli query wasm list-code` after each individual upload to get the contract ID. You will be needing the IDs in the next step.
-
-```shell
-# Upload both cw20-base and cw721-base from cosmwasm-plus/artifacts/ directory
-wasmcli tx wasm store cw20_base.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
-wasmcli tx wasm store cw721_base.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
-
-# Upload marketplace from hackatom_v/artifacts/ directory
-wasmcli tx wasm store marketplace.wasm --from client --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y
-```
-
-### Instantiating the Contracts
-
-Now that we've uploaded our contracts to the blockchain, we need to instantiate them individually using the IDs we got from uploading.
-
-```shell
-# cw20-base initialization
-wasmcli tx wasm instantiate <CW20_BASE_CONTRACT_ID> '{
-  "name": "<INSERT_NAME>",
-  "symbol": "<INSERT_SYMBOL>",
-  "decimals": <INSERT_DECIMALS>,
-  "initial_balances": [
-    {
-      "address": "<INSERT_ADDR>",
-      "amount": "<INSERT_AMOUNT>"
-    }
-  ],
-  "mint": {
-    "minter": "<INSERT_MINTER_ADDR>"
-  }
-}' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
-
-# cw721-base initialization
-wasmcli tx wasm instantiate <CW721_BASE_CONTRACT_ID> '{
-  "name": "<INSERT_NAME>",
-  "symbol": "<INSERT_SYMBOL>",
-  "minter": "<INSERT_MINTER_ADDR>"
-}' --label "cw721-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
-
-# marketplace initialization
-wasmcli tx wasm instantiate <MARKETPLACE_CONTRACT_ID> '{
-  "name": "<INSERT_NAME>"
-}' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
-```
-
-Once instantiated, you can use `wasmcli query wasm list-contract-by-code <CONTRACT_ID>` to query contract info.
-
-### Executing a Contract Method
-
-```shell
-wasmcli tx wasm execute <CONTRACT_ADDR> '{
-  "method_name": {
-    <json encoded method params>
-  }
-}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
-```
-
-#### Selling an NFT Token
+### Sell CW721 Token
 
 Puts an NFT token up for sale.
 
-```shell
-# Mint NFT token
-wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
-  "mint": {
-    "token_id": "<TOKEN_ID>",
-    "owner": "<OWNER_ADDR>",
-    "name": "<TOKEN_NAME>",
-    "level": <TOKEN_LEVEL>
-  }
-}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
+> :warning: The seller needs to be the owner of the token to be able to sell it.
 
+```shell
 # Execute send_nft action to put token up for sale for specified list_price on the marketplace
 wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
   "send_nft": {
@@ -159,11 +67,11 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
-#### Withdrawing an NFT Token Offering
+### Withdraw CW721 Token Offering
 
 Withdraws an NFT token offering from the global offerings list and returns the NFT token back to its owner.
 
-> :warning: This will only work after having used `sell_nft` on a token.
+> :warning: Only the token's owner/seller can withdraw the offering. This will only work after having used `sell_nft` on a token.
 
 ```shell
 # Execute withdraw_nft action to withdraw the token with the specified offering_id from the marketplace
@@ -174,7 +82,7 @@ wasmcli tx wasm execute <MARKETPLACE_CONTRACT_ADDR> '{
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
-#### Buying an NFT Token
+### Buy CW721 Token
 
 Buys an NFT token, transferring funds to the seller and the token to the buyer.
 
@@ -203,7 +111,9 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
 
-#### Querying List of Offerings
+## Queries
+
+### Query Offerings
 
 Retrieves a list of all currently listed offerings.
 
