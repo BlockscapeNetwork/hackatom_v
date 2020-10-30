@@ -9,7 +9,7 @@ The marketplace smart contracts provides a platform for selling and buying CW721
 * [Wasmd v0.11.1](https://github.com/CosmWasm/wasmd/tree/v0.11.1)
 * [cosmwasm-plus v0.3.2](https://github.com/CosmWasm/cosmwasm-plus)
   * [cw20-base](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw20-base)
-  * [cw721-base](https://github.com/CosmWasm/cosmwasm-plus/tree/master/contracts/cw721-base)
+  * [cosmons](https://github.com/BlockscapeNetwork/hackatom_v/tree/master/contracts/cosmons)
 
 ## Setup Environment
 
