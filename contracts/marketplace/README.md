@@ -107,7 +107,7 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
 Retrieves a list of all currently listed offerings.
 
 ```shell
-wasmcli query wasm contract_state smart <MARKETPLACE_CONTRACT_ADDR> '{
+wasmcli query wasm contract-state smart <MARKETPLACE_CONTRACT_ADDR> '{
   "get_offerings": {}
-}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
+}'
 ```
