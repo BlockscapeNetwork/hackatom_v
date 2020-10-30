@@ -57,18 +57,10 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "token_id": "<TOKEN_ID>",
     "msg": {
-      "receive": {
-        "cw721_rcv": {
-          "sender": "<INSERT_SENDER_ADDR>",
-          "token_id": "<INSERT_TOKEN_ID>",
-          "msg": {
-            "sell_nft": {
-              "list_price": {
-                "address": "<INSERT_ADDR>",
-                "amount": "<INSERT_AMOUNT>"
-              }
-            }
-          }
+      "sell_nft": {
+        "list_price": {
+          "address": "<INSERT_ADDR>",
+          "amount": "<INSERT_AMOUNT>"
         }
       }
     }
@@ -104,16 +96,8 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "amount": "<INSERT_AMOUNT>",
     "msg": {
-      "receive": {
-        "cw20_rcv": {
-          "sender": "<INSERT_SENDER_ADDR>",
-          "amount": "<INSERT_AMOUNT>",
-          "msg": {
-            "buy_nft": {
-              "offering_id": "<INSERT_OFFERING_ID>"
-            }
-          }
-        }
+      "buy_nft": {
+        "offering_id": "<INSERT_OFFERING_ID>"
       }
     }
   }
