@@ -128,9 +128,9 @@ Puts an NFT token up for sale.
 wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
   "mint": {
     "token_id": "<TOKEN_ID>",
-    "owner": "OWNER_ADDR",
-    "name": "TOKEN_NAME",
-    "level": "TOKEN_LEVEL"
+    "owner": "<OWNER_ADDR>",
+    "name": "<TOKEN_NAME>",
+    "level": <TOKEN_LEVEL>
   }
 }'
 
@@ -205,7 +205,7 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
 
 #### Querying List of Offerings
 
-Queries a list of all currently listed offerings.
+Retrieves a list of all currently listed offerings.
 
 ```shell
 wasmcli query wasm contract_state smart <MARKETPLACE_CONTRACT_ADDR> '{
