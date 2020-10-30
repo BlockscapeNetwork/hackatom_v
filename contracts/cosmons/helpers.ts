@@ -463,13 +463,15 @@ const cw721 = CW721(client);
 client.getAccount()
 partner.getAccount()
 
-const codeId = 30;
+const codeId = 39;
 
 const initMsg = { name: "Cosmons", symbol: "mons",  minter: address };
 
 const contract = await client.instantiate(codeId, initMsg, "Virtual Cosmons 1");
 
 const mine = cw721.use(contract.contractAddress);
+
+conrAdd= cosmos1pgvk0pzmmrz5syz3dxxfav39pe8h5unxdrx5e0
 
 continue or stop here and jump to 2) 
 
@@ -489,4 +491,7 @@ mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx")
 
 mine.battleMonster("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb","monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx");
 
+with CLI:
+
+wasmcli q wasm contract-state smart cosmos1pgvk0pzmmrz5syz3dxxfav39pe8h5unxdrx5e0 '{"nft_info": {"token_id": "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb"}}'
 */
