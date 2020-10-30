@@ -15,20 +15,20 @@ docker run --rm -v "$(pwd)":/code \
 
 `npx @cosmjs/cli@^0.23 --init contracts/cosmons/helpers.ts`
 
-:warning: Please, keep in mind that helper.ts uses a local wasmd 0.11.1 instance. Please, update your parameters accordingly.
+:warning: Please, keep in mind that helper.ts uses a local wasmd 0.11.1 instance (localnetOptions). Please, update your parameters accordingly.
 
-For heldernet, you need to use `defaultOptions` in useOptions.
+For hackatom net, you need to use `defaultOptions` in useOptions.
 
 ### Using a contract
 
 ```typescript
-// Local
+// Hackatom_V Net
 const client = await useOptions(defaultOptions).setup(<YOUR PASSWORD>);
-const partner = await useOptions(defaultOptions).setup(<YOUR PASSWORD>, "/Users/user/.localnet2.key");
+const partner = await useOptions(defaultOptions).setup(<YOUR PASSWORD>, "/Users/user/.hackatom2.key");
 
-// Heldernet
-const client = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/heldernet.key");
-const partner = await useOptions(heldernetOptions).setup(<YOUR PASSWORD>, "/Users/user/heldernet2.key");
+// localnet
+const client = await useOptions(localnetOptions).setup(<YOUR PASSWORD>, "/Users/user/localnet.key");
+const partner = await useOptions(localnetOptions).setup(<YOUR PASSWORD>, "/Users/user/localnet2.key");
 
 const address = client.senderAddress;
 const partnerAddr = partner.senderAddress;
