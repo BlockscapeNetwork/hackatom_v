@@ -28,7 +28,7 @@ library = []
 cw-storage-plus = { version = "0.3.2", features = ["iterator"] }
 cw0 = { version = "0.3.2" }
 cw2 = { version = "0.3.2" }
-cw721 = { version = "0.3.2" }
+cw721 = { path = "../../packages/cw721", version = "0.3.2" }
 
 cosmwasm-std = { version = "0.11.1" }
 schemars = "0.7"
