@@ -1,13 +1,16 @@
+use crate::package::AllNftInfoResponse;
+use crate::package::NftInfoResponse;
 use cosmwasm_std::{
-    attr, from_binary, to_binary, Api, Binary, BlockInfo, CosmosMsg, Env, Extern, HandleResponse,
-    HumanAddr, InitResponse, MessageInfo, Order, Querier, StdError, StdResult, Storage, KV,
+    attr, to_binary, Api, Binary, BlockInfo, Env, Extern, HandleResponse, HumanAddr, InitResponse,
+    MessageInfo, Order, Querier, StdError, StdResult, Storage, KV,
 };
+use cw721::Cw721ReceiveMsg;
 
 use cw0::maybe_canonical;
 use cw2::set_contract_version;
 use cw721::{
-    AllNftInfoResponse, ApprovedForAllResponse, ContractInfoResponse, Expiration, NftInfoResponse,
-    NumTokensResponse, OwnerOfResponse, TokensResponse,
+    ApprovedForAllResponse, ContractInfoResponse, Expiration, NumTokensResponse, OwnerOfResponse,
+    TokensResponse,
 };
 
 use crate::error::ContractError;
@@ -173,18 +176,18 @@ pub fn handle_send_nft<S: Storage, A: Api, Q: Querier>(
     token_id: String,
     msg: Option<Binary>,
 ) -> Result<HandleResponse, ContractError> {
-    // Unwrap message first
-    let msgs: Vec<CosmosMsg> = match &msg {
-        None => vec![],
-        Some(msg) => vec![from_binary(msg)?],
-    };
-
     // Transfer token
     _transfer_nft(deps, &env, &info, &contract, &token_id)?;
 
+    let send = Cw721ReceiveMsg {
+        sender: info.sender.clone(),
+        token_id: token_id.clone(),
+        msg,
+    };
+
     // Send message
     Ok(HandleResponse {
-        messages: msgs,
+        messages: vec![send.into_cosmos_msg(contract.clone())?],
         attributes: vec![
             attr("action", "send_nft"),
             attr("sender", info.sender),
