@@ -56,7 +56,7 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
   "send_nft": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "token_id": "<TOKEN_ID>",
-    "msg": "<BASE64_ENCODED_JSON({ "list_price": { "address": "<INSERT_ADDR>", "amount": "<INSERT_AMOUNT>" })>"
+    "msg": "BASE64_ENCODED_JSON<{ "list_price": { "address": "<INSERT_CW20_CONTRACT_ADDR>", "amount": "<INSERT_AMOUNT_WITHOUT_DENOM>" }}>"
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
