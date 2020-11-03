@@ -1,0 +1,28 @@
+wasmcli query wasm contract-state smart cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 '{ "balance": { "address": "cosmos1sm0hkulk4nufzq7dszdgv08xns3v8575h5g9ug" } }'
+
+cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 (contractAddress20)
+
+wasmcli tx wasm execute cosmos1g9vtch4xc9pl0fq2586mapzyjaw2yvv9xlcs6j '{
+  "send_nft": {
+    "contract": "cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4",
+    "token_id": "monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb",
+    "msg": "eyJsaXN0X3ByaWNlIjp7ImFkZHJlc3MiOiJjb3Ntb3Mxa2Z6M21qODRhdHFqbGQwZ2U5ZWNjdWp2cXFrcWRyNHFxczl1ZDciLCJhbW91bnQiOiI5OSJ9fQ"
+  }
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from cw721
+
+
+wasmcli query wasm contract-state smart cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 '{
+  "get_offerings": {}
+}'
+
+wasmcli tx wasm execute cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 '{
+  "withdraw_nft": {
+    "offering_id": "4"
+  }
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from cw721
+
+wasmcli tx wasm execute cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 '{
+  "withdraw_nft": {
+    "offering_id": "4"
+  }
+}' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from cw721
