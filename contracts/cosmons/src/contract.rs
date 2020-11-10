@@ -622,7 +622,9 @@ fn humanize_approval<A: Api>(api: A, approval: &Approval) -> StdResult<cw721::Ap
 
 #[cfg(test)]
 mod tests {
+    use cosmwasm_std::from_binary;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
+    use cosmwasm_std::CosmosMsg;
     use cosmwasm_std::WasmMsg;
 
     use super::*;
@@ -833,8 +835,8 @@ mod tests {
         let mint_msg = HandleMsg::Mint(MintMsg {
             token_id: token_id.clone(),
             owner: "venus".into(),
-            name: name.clone(),
             level: 1,
+            name: name.clone(),
             description: Some(description.clone()),
             image: None,
         });
@@ -842,18 +844,12 @@ mod tests {
         let minter = mock_info(MINTER, &[]);
         handle(&mut deps, mock_env(), minter, mint_msg).unwrap();
 
-        // random cannot send
-        let inner_msg = WasmMsg::Execute {
-            contract_addr: "another_contract".into(),
-            msg: to_binary("You now have the melting power").unwrap(),
-            send: vec![],
-        };
-        let msg: CosmosMsg = CosmosMsg::Wasm(inner_msg);
-
+        let msg = to_binary("You now have the melting power").unwrap();
+        let target = HumanAddr::from("another_contract");
         let send_msg = HandleMsg::SendNft {
-            contract: "another_contract".into(),
+            contract: target.clone(),
             token_id: token_id.clone(),
-            msg: Some(to_binary(&msg).unwrap()),
+            msg: Some(msg.clone()),
         };
 
         let random = mock_info("random", &[]);
@@ -866,10 +862,25 @@ mod tests {
         // but owner can
         let random = mock_info("venus", &[]);
         let res = handle(&mut deps, mock_env(), random, send_msg).unwrap();
+
+        let payload = Cw721ReceiveMsg {
+            sender: "venus".into(),
+            token_id: token_id.clone(),
+            msg: Some(msg),
+        };
+        let expected = payload.into_cosmos_msg(target.clone()).unwrap();
+        // ensure expected serializes as we think it should
+        match &expected {
+            CosmosMsg::Wasm(WasmMsg::Execute { contract_addr, .. }) => {
+                assert_eq!(contract_addr, &target)
+            }
+            m => panic!("Unexpected message type: {:?}", m),
+        }
+        // and make sure this is the request sent by the contract
         assert_eq!(
             res,
             HandleResponse {
-                messages: vec![msg],
+                messages: vec![expected],
                 attributes: vec![
                     attr("action", "send_nft"),
                     attr("sender", "venus"),

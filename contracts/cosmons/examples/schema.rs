@@ -1,13 +1,14 @@
+use cosmons::package::{AllNftInfoResponse, NftInfoResponse};
 use std::env::current_dir;
 use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
 
-use cw721::{
-    AllNftInfoResponse, ApprovedForAllResponse, ContractInfoResponse, NftInfoResponse,
-    NumTokensResponse, OwnerOfResponse, TokensResponse,
-};
 use cosmons::msg::{HandleMsg, InitMsg, MinterResponse, QueryMsg};
+use cw721::{
+    ApprovedForAllResponse, ContractInfoResponse, NumTokensResponse, OwnerOfResponse,
+    TokensResponse,
+};
 
 fn main() {
     let mut out_dir = current_dir().unwrap();

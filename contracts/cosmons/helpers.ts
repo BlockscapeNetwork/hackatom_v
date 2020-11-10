@@ -463,7 +463,7 @@ const cw721 = CW721(client);
 client.getAccount()
 partner.getAccount()
 
-const codeId = 30;
+const codeId = 94;
 
 const initMsg = { name: "Cosmons", symbol: "mons",  minter: address };
 
@@ -481,12 +481,12 @@ mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
 ----
 2)
 
-mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb", address, "Cosmos", 20, "Minted Cosmon!");
-mine.mint("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx", address, "Cosmos", 25, "Minted Cosmon!");
+mine.mint("monster112sarcsb", address, "Rustmorph", 20, "The Rustmorph is the coolest of the six original monster from Neptun");
+mine.mint("monster112awrcsx", address, "Emberhand", 25, "The Rustmorph is the tallest of the five original monster from Saturn");
 
-mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb")
-mine.nftInfo("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx")
+mine.nftInfo("monster112sarcsb")
+mine.nftInfo("monster112awrcsx")
 
-mine.battleMonster("monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsb","monster112a9lf95atqvyejqe22xnna8x4mfqd75tkq2kvwcjyysarcsx");
+mine.battleMonster("monster112sarcsb","monster112awrcsx");
 
 */
