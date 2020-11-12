@@ -1,8 +1,8 @@
 # How To
 
-This is a guide on how to setup your own set of contracts in conjunction with the marketplace.
+This is a guide on how to setup your own set of contracts on the hackatom-wasm chain in conjunction with the marketplace. If you want to deploy the contracts on a local chain, please follow the [CosmWasm docs](https://docs.cosmwasm.com/getting-started/setting-env.html#run-local-node-optional) for instructions on how to set up a local node.
 
-You will need two accounts with some tokens from the [faucet](https://five.hackatom.org/resources). Otherwise, you won't be able to upload the smart contracts.
+You will need two accounts with some tokens from the [faucet](https://five.hackatom.org/resources). Otherwise, you won't be able to upload the smart contracts to the hackatom-wasm chain.
 
 > :information_source: **If you already have accounts with funds, you can skip this step.**
 
@@ -51,15 +51,23 @@ Now that we've uploaded our contracts to the blockchain, we need to instantiate 
 
 ```shell
 # cw20-base initialization
+# - name: Name of your CW20 contract
+# - symbol: All upper case symbol of your CW20 token
+# - decimals: Number of decimal places for your tokens
+# - initial balances: Array with one or more accounts to give some tokens on contract initialization
+#   - address: Account address to receive tokens
+#   - amount: Amount of tokens the address should receive
+# - mint: Object holding the minter address
+#   - minter: Account address of the CW20 token minter
 wasmcli tx wasm instantiate <CW20_BASE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>",
-  "symbol": "<INSERT_SYMBOL>",
+  "symbol": "<INSERT_ALL_UPPER_CASE_SYMBOL>",
   "decimals": <INSERT_NUM_OF_DECIMAL_PLACES_FOR_TOKEN>,
   "initial_balances": [
     {
       "address": "<INSERT_ADDR>",
       "amount": "<INSERT_AMOUNT>"
-    }
+    },
   ],
   "mint": {
     "minter": "<INSERT_MINTER_ADDR>"
@@ -67,6 +75,9 @@ wasmcli tx wasm instantiate <CW20_BASE_CONTRACT_ID> '{
 }' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 
 # cw721-base initialization
+# - name: Name of your CW721 contract
+# - symbol: All upper case symbol of your CW721 token
+# - minter: Account address of the CW721 token minter
 wasmcli tx wasm instantiate <CW721_BASE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>",
   "symbol": "<INSERT_ALL_UPPER_CASE_SYMBOL>",
@@ -74,6 +85,7 @@ wasmcli tx wasm instantiate <CW721_BASE_CONTRACT_ID> '{
 }' --label "cw721-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 
 # marketplace initialization
+# - name: Name of your marketplace contract
 wasmcli tx wasm instantiate <MARKETPLACE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>"
 }' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
