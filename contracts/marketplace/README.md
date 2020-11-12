@@ -40,7 +40,7 @@ Example payload:
 
 ```json
 {
-  "address": "<INSERT_ADDRESS>"
+  "address": "<INSERT_ACCOUNT_ADDRESS>"
 }
 ```
 
@@ -51,6 +51,8 @@ Example payload:
 | marketplace     | cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 |
 | cw20-base       | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
 | cosmons (cw721) | cosmos1zhh3m9sg5e2qvjgwr49r79pf5pt65yuxvs7cs0 |
+
+> :information_source: If you want to deploy your own contracts, check out the [HOWTO](HOWTO.md).
 
 ## Messages
 
@@ -66,7 +68,7 @@ wasmcli tx wasm execute <CW721_BASE_CONTRACT_ADDR> '{
   "send_nft": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "token_id": "<TOKEN_ID>",
-    "msg": "BASE64_ENCODED_JSON<{ "list_price": { "address": "<INSERT_CW20_CONTRACT_ADDR>", "amount": "<INSERT_AMOUNT_WITHOUT_DENOM>" }}>"
+    "msg": "BASE64_ENCODED_JSON --> { "list_price": { "address": "<INSERT_CW20_CONTRACT_ADDR>", "amount": "<INSERT_AMOUNT_WITHOUT_DENOM>" }} <--"
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
@@ -98,7 +100,7 @@ wasmcli tx wasm execute <CW20_BASE_CONTRACT_ADDR> '{
   "send": {
     "contract": "<MARKETPLACE_CONTRACT_ADDR>",
     "amount": "<INSERT_AMOUNT>",
-    "msg": "<BASE64_ENCODED_JSON({ "offering_id": "<INSERT_OFFERING_ID>" })"
+    "msg": "BASE64_ENCODED_JSON --> { "offering_id": "<INSERT_OFFERING_ID>" } <--"
   }
 }' --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 ```
