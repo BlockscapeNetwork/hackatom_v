@@ -16,6 +16,8 @@ The marketplace smart contracts provides a generic platform used for selling and
 1) Follow [the CosmWasm docs](https://docs.cosmwasm.com/getting-started/installation.html) to install `go v1.14+`, `rust v1.44.1+` and `wasmd v0.11.1`
 2) Once you've built `wasmd`, use the `wasmcli` to join the `hackatom-wasm` chain.
 
+> :information_source: If you want to deploy your own contracts on your own chain, check out the [HOWTO](HOWTO.md).
+
 ```shell
 wasmcli config chain-id hackatom-wasm
 wasmcli config indent true
@@ -51,8 +53,6 @@ Example payload:
 | marketplace     | cosmos1knqr4zclds5zhn5khkpexkd7nctwe8z0s2qer4 |
 | cw20-base       | cosmos1kfz3mj84atqjld0ge9eccujvqqkqdr4qqs9ud7 |
 | cosmons (cw721) | cosmos1zhh3m9sg5e2qvjgwr49r79pf5pt65yuxvs7cs0 |
-
-> :information_source: If you want to deploy your own contracts, check out the [HOWTO](HOWTO.md).
 
 ## Messages
 
