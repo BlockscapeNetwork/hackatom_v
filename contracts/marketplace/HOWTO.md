@@ -24,7 +24,7 @@ We need to build three smart contracts in total:
 # Make sure all of your contracts actually build using
 cargo wasm
 
-# Use the workspace-optimizer v0.10.4 to build your contracts
+# Switch into the hackatom_v/ directory and use the workspace-optimizer v0.10.4 to build your contracts
 docker run --rm -v "$(pwd)":/code \
   --mount type=volume,source="$(basename "$(pwd)")_cache",target=/code/target \
   --mount type=volume,source=registry_cache,target=/usr/local/cargo/registry \
@@ -51,9 +51,9 @@ Now that we've uploaded our contracts to the blockchain, we need to instantiate 
 
 ```shell
 # cw20-base initialization
-# - name: Name of your CW20 contract
-# - symbol: All upper case symbol of your CW20 token
-# - decimals: Number of decimal places for your tokens
+# - name: Your custom name of your CW20 contract
+# - symbol: All upper case symbol of your CW20 token, must be 3-6 characters long (i.e. ATOM)
+# - decimals: Number of decimal places for your tokens (i.e. 3 -> 1.xxx ATOM)
 # - initial balances: Array with one or more accounts to give some tokens on contract initialization
 #   - address: Account address to receive tokens
 #   - amount: Amount of tokens the address should receive
@@ -65,9 +65,9 @@ wasmcli tx wasm instantiate <CW20_BASE_CONTRACT_ID> '{
   "decimals": <INSERT_NUM_OF_DECIMAL_PLACES_FOR_TOKEN>,
   "initial_balances": [
     {
-      "address": "<INSERT_ADDR>",
+      "address": "<INSERT_ACCOUNT_ADDR>",
       "amount": "<INSERT_AMOUNT>"
-    },
+    }
   ],
   "mint": {
     "minter": "<INSERT_MINTER_ADDR>"
@@ -75,17 +75,17 @@ wasmcli tx wasm instantiate <CW20_BASE_CONTRACT_ID> '{
 }' --label "cw20-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 
 # cw721-base initialization
-# - name: Name of your CW721 contract
-# - symbol: All upper case symbol of your CW721 token
+# - name: Your custom name of your CW721 contract
+# - symbol: All upper case symbol of your CW721 token, must be 3-6 characters long (i.e. ATOM)
 # - minter: Account address of the CW721 token minter
 wasmcli tx wasm instantiate <CW721_BASE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>",
   "symbol": "<INSERT_ALL_UPPER_CASE_SYMBOL>",
-  "minter": "<INSERT_MINTER_ADDR>"
+  "minter": "<INSERT_MINTER_ACCOUNT_ADDR>"
 }' --label "cw721-base" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
 
 # marketplace initialization
-# - name: Name of your marketplace contract
+# - name: Your custom name of your marketplace contract
 wasmcli tx wasm instantiate <MARKETPLACE_CONTRACT_ID> '{
   "name": "<INSERT_NAME>"
 }' --label "marketplace" --gas-prices="0.025ucosm" --gas="auto" --gas-adjustment="1.2" -y --from client
